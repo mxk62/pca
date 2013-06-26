@@ -26,20 +26,6 @@ def save_array(a, filename):
             f.write('\n')
 
 
-def is_published(db, rxn):
-    """Returns true if reaction is published.
-
-    Functions scans a collection looking for a reaction having exactly the same
-    SMILES as input reaction. Returns True, if found.
-    """
-    doc = db.chemical.find_one({'smiles': rxn.prod_smis[0]})
-    if doc is not None:
-        for uid in doc['reactions']['produced']:
-            if db.reaction.find_one({'reaction_smarts': rxn.smi}) is not None:
-                return 1
-    return 0
-
-
 # Initialize connection with the database.
 try:
     client = MongoClient()
@@ -55,32 +41,42 @@ for rec in db['retro'].find():
     transforms.append(t)
 
 # Get a random sample of chemical compounds.
-samplesize = 100
+samplesize = 1000
 sample = Sample(db['chemical'])
 
 # For each chemical perform a single retrosynthetic step.
-reactions = set([])
+reactions = {}
 for rec in sample.get(samplesize):
     chem = Chemical(rec['smiles'].encode('ascii'))
+
+    # Add existing incoming reactions of the chemical to the pool of all
+    # possible reactions allowing for sythnesizing the compound.
+    for uid in rec['reactions']['produced']:
+        smi = db['reaction'].find_one({'_id': uid}).get('smiles', None)
+        if smi is not None:
+            reactions[smi.encode('ascii')] = 1
+
+    # Then, iterate over available transforms to generate any possible reaction
+    # leading to it, adding only unkonwn new ones to the pool.
+    #
+    # Note:
+    # Using setdefault() method enusres that existing reactions, already in the
+    # pool, will not their status overwritten.
     for transform in transforms:
         if len(transform.retrons) != 1:
             continue
-        rxn_smis = chem.make_retrostep(transform)
-        if rxn_smis is not None:
-            reactions.update(rxn_smis)
+        for smi in chem.make_retrostep(transform):
+            reactions.setdefault(smi, 0)
 
 # Calculate reactions descriptors.
 indata = []
-ispublished = []
-for smi in reactions:
+status = []
+for smi, stat in reactions.items():
     rxn = Reaction(smi)
-    ispublished.append(is_published(db, rxn))
     indata.append(rxn.get_descriptors())
+    status.append([stat])
 save_array(indata, 'descriptors.dat')
-
-with open('ispublished.dat', 'w') as f:
-    for e in ispublished:
-        f.write(str(e) + '\n')
+save_array(status, 'status.dat')
 
 # Here goes PCA analysis.
 outdata = mdp.pca(array(indata))
