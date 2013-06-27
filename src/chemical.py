@@ -26,6 +26,8 @@ class Chemical:
         rxn_smis = set([])
         if product_list:
             for products in product_list:
+                if not products:
+                    continue
                 reactant_smis = '.'.join(Chem.MolToSmiles(p) for p in products)
             rxn_smis.add(reactant_smis + '>>' + self.smiles)
         return rxn_smis
