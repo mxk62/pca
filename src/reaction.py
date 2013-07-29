@@ -1,6 +1,6 @@
 import sys
-from rdkit import Chem
 from rdkit.Chem import AllChem
+from chemical import Chemical
 
 
 class Reaction:
@@ -8,30 +8,45 @@ class Reaction:
 
     def __init__(self, smiles):
         """Initialize entry."""
-        self.smi = smiles.strip()
+        self.smiles = smiles.strip()
         self.react_smis, self.prod_smis = [s.split('.')
-                                           for s in self.smi.split('>>')]
+                                           for s in self.smiles.split('>>')]
+        self.reactants = [Chemical(smi) for smi in self.react_smis]
+        self.products = [Chemical(smi) for smi in self.prod_smis]
         self.is_published = None
 
     def get_descriptors(self):
         """Calculate and returns a list of reaction descriptors."""
 
         # Count carbons in reaction SMILES.
-        carbons = self.smi.count('C') + self.smi.count('c')
+        carbons = self.smiles.count('C') + self.smiles.count('c')
 
         # Esitmate a total mass of reactants.
         mass = 0
-        for smi in self.react_smis:
-            m = Chem.MolFromSmiles(smi)
-            if m is not None:
-                for a in m.GetAtoms():
+        for chem in self.reactants:
+            if chem.mol is not None:
+                for a in chem.mol.GetAtoms():
                     mass += a.GetMass()
 
         return [carbons, mass]
 
-    def is_published(self):
-        """Returns True if a reactions is published."""
-        pass
+    def get_group_descriptor(self, groups):
+        """Return descriptor based on functional group count.
+
+        Function returns a vector which elemnts indicates how many functional
+        group of a given type are present in reaction's reactants.
+        """
+
+        group_count = {}
+        for chem in self.reactants:
+            for group, count in chem.functional_groups.items():
+                group_count.setdefault(group, 0.0)
+                group_count[group] += count
+
+        descriptor = []
+        for smarts in sorted(groups.keys()):
+            descriptor.append(group_count.get(smarts, 0))
+        return descriptor
 
 
 class Transform:
