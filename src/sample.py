@@ -7,7 +7,7 @@ from pymongo.errors import ConnectionFailure
 class Sample:
     """Represents a random sample from a given database collection."""
 
-    def __init__(self, collection):
+    def __init__(self, collection, rng_seed=None):
         """Sets a database collection which will be used."""
 
         self.coll = collection
@@ -17,7 +17,7 @@ class Sample:
 
         # Initialize pseudo-random number generator.
         self.rng = random.Random()
-        self.rng.seed()
+        self.rng.seed(rng_seed)
 
     def clear(self):
         """Clears the conentent of the sample."""
