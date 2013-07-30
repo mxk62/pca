@@ -30,7 +30,7 @@ def save_array(a, filename):
 # Create a map between functional group SMARTS and their representation as
 # query molecules (used in RDKit's HasSubstructMatch() function).
 groups = {}
-with open('functional_groups.txt', 'r') as f:
+with open('../data/functional_groups.txt', 'r') as f:
     for line in f:
         gid, smarts = line.split()
         try:
