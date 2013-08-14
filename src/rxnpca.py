@@ -54,7 +54,7 @@ for rec in db['retro'].find():
     transforms.append(t)
 
 # Get a random sample of chemical compounds.
-samplesize = 100
+samplesize = 1000
 sample = Sample(db['chemical'], rng_seed=1)
 
 # For each chemical in the sample perform a single retrosynthetic step.
@@ -106,8 +106,8 @@ for smi in bad_smis:
 indata = []
 status = []
 for smi, rxn in reactions.items():
-    #indata.append(rxn.get_descriptors())
-    indata.append(rxn.get_group_descriptor(groups))
+    indata.append(rxn.get_descriptors())
+    #indata.append(rxn.get_group_descriptor(groups))
     status.append([int(rxn.is_published)])
 save_array(indata, 'descriptors.dat')
 save_array(status, 'status.dat')
@@ -125,7 +125,7 @@ save_array(status, 'status.dat')
 #  - output_dim=10 will keep first 10 principal components
 #  - output_dim=0.8 will keep the number of principal components which can
 #    account for 80% of the input variance.
-pcanode = mdp.nodes.PCANode(output_dim=0.9)
+pcanode = mdp.nodes.PCANode(output_dim=0.95)
 
 # The node need to be trained to perform its task. PCA algorithm requires the
 # computation of the mean and covariance matrix of a set of training data from
@@ -140,5 +140,7 @@ pcanode.stop_training()
 # project the input data on the principal components learned in the training
 # phase.
 outdata = pcanode.execute(array(indata))
+for i, x in enumerate(pcanode.d, start=1):
+    print i, x
 
-save_array(outdata, 'pca.dat')
+save_array(outdata, 'projection.dat')
