@@ -1,5 +1,6 @@
 import sys
 from rdkit import Chem
+from rdkit.Chem import Descriptors
 
 
 class Chemical:
@@ -13,6 +14,40 @@ class Chemical:
             print 'Error: invalid compound SMILES: {}.'.format(self.smiles)
             sys.exit(1)
         self.functional_groups = None
+
+    def count_atoms(self):
+        return len(self.mol.GetAtoms())
+
+    def count_bonds(self):
+        return len(self.mol.GetBonds())
+
+    def count_rings(self):
+        return self.mol.GetRingInfo().NumRings()
+
+    def get_weight(self):
+        return sum(a.GetMass() for a in self.mol.GetAtoms())
+
+    def get_randic(self):
+        kappa = 0
+        for b in self.mol.GetBonds():
+            di = b.GetBeginAtom().GetDegree()
+            dj = b.GetEndAtom().GetDegree()
+            kappa += 1.0 / (di * dj)
+        return kappa
+
+    def get_balaban(self):
+        return Descriptors.BalabanJ(self.mol)
+
+    def get_bertz(self):
+        return Descriptors.BertzCT(self.mol)
+
+    def get_ipc(self):
+        return Descriptors.IPC(self.mol)
+
+    def get_kier_flex(self):
+        k1 = Descriptors.Kappa1(self.mol)
+        k2 = Descriptors.Kappa2(self.mol)
+        return k1 * k2 / len(self.mol.GetAtoms())
 
     def make_retrostep(self, transform):
         """Returns unique reaction smiles obtained by retrosynthesis."""
