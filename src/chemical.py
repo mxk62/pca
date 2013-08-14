@@ -17,20 +17,23 @@ class Chemical:
     def make_retrostep(self, transform):
         """Returns unique reaction smiles obtained by retrosynthesis."""
 
+        rxn_smis = set([])
+
         product_list = []
         try:
             product_list = transform.formula.RunReactants((self.mol,))
         except Exception:
-            # For now, ignore silently any errors.
-            pass
+            return rxn_smis
 
-        rxn_smis = set([])
         if product_list:
             for products in product_list:
-                if not products:
+                try:
+                    [Chem.SanitizeMol(m) for m in products]
+                except Exception:
                     continue
+
                 reactant_smis = '.'.join(Chem.MolToSmiles(p) for p in products)
-            rxn_smis.add(reactant_smis + '>>' + self.smiles)
+                rxn_smis.add(reactant_smis + '>>' + self.smiles)
         return rxn_smis
 
     def find_groups(self, groups):
