@@ -18,17 +18,41 @@ class Reaction:
     def get_descriptors(self):
         """Calculate and returns a list of reaction descriptors."""
 
-        # Count carbons in reaction SMILES.
-        carbons = self.smiles.count('C') + self.smiles.count('c')
+        # Calculate number of atoms.
+        r_atoms = sum(chem.count_atoms() for chem in self.reactants)
+        p_atoms = sum(chem.count_atoms() for chem in self.products)
 
-        # Esitmate a total mass of reactants.
-        mass = 0
-        for chem in self.reactants:
-            if chem.mol is not None:
-                for a in chem.mol.GetAtoms():
-                    mass += a.GetMass()
+        # Calculate number of bonds.
+        r_bonds = sum(chem.count_bonds() for chem in self.reactants)
+        p_bonds = sum(chem.count_bonds() for chem in self.products)
 
-        return [carbons, mass]
+        # Calculate number of rings.
+        r_rings = sum(chem.count_rings() for chem in self.reactants)
+        p_rings = sum(chem.count_rings() for chem in self.products)
+
+        # Calculate masses.
+        r_mass = sum(chem.get_weight() for chem in self.reactants)
+        p_mass = sum(chem.get_weight() for chem in self.products)
+
+        # Calculate Randic indices.
+        r_randic = sum(chem.get_randic() for chem in self.reactants)
+        p_randic = sum(chem.get_randic() for chem in self.products)
+
+        # Calculate Balban J indices.
+        r_balaban = sum(chem.get_balaban() for chem in self.reactants)
+        p_balaban = sum(chem.get_balaban() for chem in self.products)
+
+        # Calculate Bert indices.
+        r_bertz = sum(chem.get_bertz() for chem in self.reactants)
+        p_bertz = sum(chem.get_bertz() for chem in self.products)
+
+        # Calculate Kier flexibility indices.
+        r_kier_flex = sum(chem.get_kier_flex() for chem in self.reactants)
+        p_kier_flex = sum(chem.get_kier_flex() for chem in self.products)
+
+        return [r_atoms, p_atoms, r_bonds, p_bonds, r_rings, p_rings,
+                r_mass, p_mass, r_balaban, p_balaban, r_bertz, p_bertz,
+                r_kier_flex, p_kier_flex, r_randic, p_randic]
 
     def get_group_descriptor(self, groups):
         """Return descriptor based on functional group count.
@@ -36,9 +60,8 @@ class Reaction:
         Function returns a vector which elemnts indicates how many functional
         group of a given type are present in reaction's reactants.
         """
-
         group_count = {}
-        for chem in self.reactants:
+        for chem in self.reactants + self.products:
             for group, count in chem.functional_groups.items():
                 group_count.setdefault(group, 0.0)
                 group_count[group] += count
