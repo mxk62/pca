@@ -48,6 +48,67 @@ class Chemical:
         k1 = Descriptors.Kappa1(self.mol)
         k2 = Descriptors.Kappa2(self.mol)
         return k1 * k2 / len(self.mol.GetAtoms())
+    
+    def get_fraction_CSP3(self):
+        return Descriptors.FractionCSP3(self.mol)
+    
+    def get_num_aliphatic_carbocycles(self):
+        return Descriptors.NumAliphaticCarbocycles(self.mol)
+    
+    def get_num_aliphatic_heterocycles(self):
+        return Descriptors.NumAliphaticHeterocycles(self.mol)
+    
+    def get_num_saturated_rings(self):
+        return Descriptors.NumSaturatedRings(self.mol)
+    
+    def get_num_saturated_heterocycles(self):
+        return Descriptors.NumSaturatedHeterocycles(self.mol)
+    
+    def get_num_saturated_carbocycles(self):
+        return Descriptors.NumSaturatedCarbocycles(self.mol)
+    
+    def get_num_aromatic_rings(self):
+        return Descriptors.NumAromaticRings(self.mol)
+    
+    def get_num_aromatic_heterocycles(self):
+        return Descriptors.NumAromaticHeterocycles(self.mol)
+    
+    def get_num_aromatic_carbocycles(self):
+        return Descriptors.NumAromaticCarbocycles(self.mol)
+    
+    def get_num_aliphatic_rings(self):
+        return Descriptors.NumAliphaticRings(self.mol)
+    
+    def get_num_H_donors(self):
+        return Descriptors.NumHDonors(self.mol)
+    
+    def get_num_H_acceptors(self):
+        return Descriptors.NumHAcceptors(self.mol)
+    
+    def get_hetero_atoms_mass(self):
+        mass = 0
+        for a in self.mol.GetAtoms():
+            if a.GetAtomicNum() != 6 and a.GetAtomicNum() != 1:
+                mass += a.GetMass()
+        return mass
+    
+    def get_fraction_hetero_atoms(self):
+        total_atom = len(self.mol.GetAtoms())
+        hetero_atom = Descriptors.NumHeteroatoms(self.mol)
+        fraction = hetero_atom/total_atom
+        return hetero_atom
+    
+    def get_fraction_rotatable_bonds(self):
+        return Descriptors.NumRotatableBonds(self.mol)
+    
+    def get_num_valance_electrons(self):
+        return Descriptors.NumValenceElectrons(self.mol)
+    
+    def get_num_radical_electrons(self):
+        return Descriptors.NumRadicalElectrons(self.mol)
+    
+    def get_heavy_atom_mol_wt(self):
+        return Descriptors.HeavyAtomMolWt(self.mol)
 
     def make_retrostep(self, transform):
         """Returns unique reaction smiles obtained by retrosynthesis."""
