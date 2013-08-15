@@ -98,9 +98,9 @@ class Reaction:
         r_H_acceptors = sum(chem.get_num_H_acceptors() for chem in self.reactants)
         p_H_acceptors = sum(chem.get_num_H_acceptors() for chem in self.products)
         
-        #Calculate fraction of hetero atoms.
-        r_hetero_atoms = sum(chem.get_fraction_hetero_atoms() for chem in self.reactants)
-        p_hetero_atoms = sum(chem.get_fraction_hetero_atoms() for chem in self.products)
+        #Calculate number of hetero atoms.
+        r_hetero_atoms = sum(chem.get_num_hetero_atoms() for chem in self.reactants)
+        p_hetero_atoms = sum(chem.get_num_hetero_atoms() for chem in self.products)
         
         #Calculate hetero atoms' total mass.
         r_hetero_atoms_mass = sum(chem.get_hetero_atoms_mass() for chem in self.reactants)
