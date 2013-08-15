@@ -49,10 +49,93 @@ class Reaction:
         # Calculate Kier flexibility indices.
         r_kier_flex = sum(chem.get_kier_flex() for chem in self.reactants)
         p_kier_flex = sum(chem.get_kier_flex() for chem in self.products)
+        
+        #Calculate fraction of C atoms SP3 hybridized.
+        r_CSP3 = sum(chem.get_fraction_CSP3() for chem in self.reactants)
+        p_CSP3 = sum(chem.get_fraction_CSP3() for chem in self.products)
+        
+        #Calculate aliphatic carbocycles.
+        r_aliphatic_carbocycles = sum(chem.get_num_aliphatic_carbocycles() for chem in self.reactants)
+        p_aliphatic_carbocycles = sum(chem.get_num_aliphatic_carbocycles() for chem in self.products)
+        
+        #Calculate aliphatic heterocycles.
+        r_aliphatic_heterocycles = sum(chem.get_num_aliphatic_heterocycles() for chem in self.reactants)
+        p_aliphatic_heterocycles = sum(chem.get_num_aliphatic_heterocycles() for chem in self.products)
+        
+        #Calculate saturated rings.
+        r_saturated_rings = sum(chem.get_num_saturated_rings() for chem in self.reactants)
+        p_saturated_rings = sum(chem.get_num_saturated_rings() for chem in self.products)
+        
+        #Calculate saturated heterocycles.
+        r_saturated_heterocycles = sum(chem.get_num_saturated_heterocycles() for chem in self.reactants)
+        p_saturated_heterocycles = sum(chem.get_num_saturated_heterocycles() for chem in self.products)
+        
+        #Calculate saturated carbocycles.
+        r_saturated_carbocycles = sum(chem.get_num_saturated_carbocycles() for chem in self.reactants)
+        p_saturated_carbocycles = sum(chem.get_num_saturated_carbocycles() for chem in self.products)
+        
+        #Calculate aromatic rings.
+        r_aromatic_rings = sum(chem.get_num_aromatic_rings() for chem in self.reactants)
+        p_aromatic_rings = sum(chem.get_num_aromatic_rings() for chem in self.products)
+        
+        #Calculate aromatic heterocycles.
+        r_aromatic_heterocycles = sum(chem.get_num_aromatic_heterocycles() for chem in self.reactants)
+        p_aromatic_heterocycles = sum(chem.get_num_aromatic_heterocycles() for chem in self.products)
+        
+        #Calculate aromatic carbocycles.
+        r_aromatic_carbocycles = sum(chem.get_num_aromatic_carbocycles() for chem in self.reactants)
+        p_aromatic_carbocycles = sum(chem.get_num_aromatic_carbocycles() for chem in self.products)
+        
+        #Calculate aliphatic rings.
+        r_aliphatic_rings = sum(chem.get_num_aliphatic_rings() for chem in self.reactants)
+        p_aliphatic_rings = sum(chem.get_num_aliphatic_rings() for chem in self.products)
+        
+        #Calculate Number of H donors.
+        r_H_donors = sum(chem.get_num_H_donors() for chem in self.reactants)
+        p_H_donors = sum(chem.get_num_H_donors() for chem in self.products)
+        
+        #Calculate Number of H acceptors.
+        r_H_acceptors = sum(chem.get_num_H_acceptors() for chem in self.reactants)
+        p_H_acceptors = sum(chem.get_num_H_acceptors() for chem in self.products)
+        
+        #Calculate fraction of hetero atoms.
+        r_hetero_atoms = sum(chem.get_fraction_hetero_atoms() for chem in self.reactants)
+        p_hetero_atoms = sum(chem.get_fraction_hetero_atoms() for chem in self.products)
+        
+        #Calculate hetero atoms' total mass.
+        r_hetero_atoms_mass = sum(chem.get_hetero_atoms_mass() for chem in self.reactants)
+        p_hetero_atoms_mass = sum(chem.get_hetero_atoms_mass() for chem in self.products)
+        
+        #Calculate fraction of rotatable bonds.
+        r_rotatable_bonds = sum(chem.get_fraction_rotatable_bonds() for chem in self.reactants)
+        p_rotatable_bonds = sum(chem.get_fraction_rotatable_bonds() for chem in self.products)
+        
+        #Calculate number of valence electrons.
+        r_valence_electrons = sum(chem.get_num_valance_electrons() for chem in self.reactants)
+        p_valence_electrons = sum(chem.get_num_valance_electrons() for chem in self.products)
+        
+        #Calculate number of radical electrons.
+        r_radical_electrons = sum(chem.get_num_radical_electrons() for chem in self.reactants)
+        p_radical_electrons = sum(chem.get_num_radical_electrons() for chem in self.products)
+        
+        #Calculate average molecular weight ignoring hydrogens.
+        r_heavy_atom_mol_wt = sum(chem.get_heavy_atom_mol_wt() for chem in self.reactants)
+        p_heavy_atom_mol_wt = sum(chem.get_heavy_atom_mol_wt() for chem in self.products)
 
         return [r_atoms, p_atoms, r_bonds, p_bonds, r_rings, p_rings,
                 r_mass, p_mass, r_balaban, p_balaban, r_bertz, p_bertz,
-                r_kier_flex, p_kier_flex, r_randic, p_randic]
+                r_kier_flex, p_kier_flex, r_randic, p_randic, r_CSP3, p_CSP3,
+                r_aliphatic_carbocycles, p_aliphatic_carbocycles, r_aliphatic_heterocycles,
+                p_aliphatic_heterocycles, r_saturated_rings, p_saturated_rings,
+                 r_saturated_heterocycles,  p_saturated_heterocycles, r_saturated_carbocycles,
+                 p_saturated_carbocycles, r_aromatic_rings, p_aromatic_rings,
+                  r_aromatic_heterocycles,  p_aromatic_heterocycles, r_aromatic_carbocycles,
+                  p_aromatic_carbocycles, r_aliphatic_rings, p_aliphatic_rings, r_H_donors,
+                  p_H_donors, r_H_acceptors, p_H_acceptors, r_hetero_atoms_mass,
+                  p_hetero_atoms_mass, r_hetero_atoms, p_hetero_atoms, r_rotatable_bonds,
+                  p_rotatable_bonds, r_valence_electrons, p_valence_electrons,
+                  r_radical_electrons, p_radical_electrons, r_heavy_atom_mol_wt,
+                  p_heavy_atom_mol_wt]
 
     def get_group_descriptor(self, groups):
         """Return descriptor based on functional group count.
