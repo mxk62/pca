@@ -121,6 +121,14 @@ class Reaction:
         #Calculate average molecular weight ignoring hydrogens.
         r_heavy_atom_mol_wt = sum(chem.get_heavy_atom_mol_wt() for chem in self.reactants)
         p_heavy_atom_mol_wt = sum(chem.get_heavy_atom_mol_wt() for chem in self.products)
+        
+        #Calculate Wildman-Crippen logP values
+        r_log_p = sum(chem.get_mol_log_p() for chem in self.reactants)
+        p_log_p = sum(chem.get_mol_log_p() for chem in self.products)
+        
+        #Calculate Wildman-Crippen mr values
+        r_mr = sum(chem.get_mol_mr() for chem in self.reactants)
+        p_mr = sum(chem.get_mol_mr() for chem in self.products)
 
         return [r_atoms, p_atoms, r_bonds, p_bonds, r_rings, p_rings,
                 r_mass, p_mass, r_balaban, p_balaban, r_bertz, p_bertz,
@@ -135,7 +143,7 @@ class Reaction:
                   p_hetero_atoms_mass, r_hetero_atoms, p_hetero_atoms, r_rotatable_bonds,
                   p_rotatable_bonds, r_valence_electrons, p_valence_electrons,
                   r_radical_electrons, p_radical_electrons, r_heavy_atom_mol_wt,
-                  p_heavy_atom_mol_wt]
+                  p_heavy_atom_mol_wt, r_log_p, p_log_p, r_mr, p_mr]
 
     def get_group_descriptor(self, groups):
         """Return descriptor based on functional group count.

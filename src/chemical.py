@@ -106,6 +106,12 @@ class Chemical:
     
     def get_heavy_atom_mol_wt(self):
         return Descriptors.HeavyAtomMolWt(self.mol)
+    
+    def get_mol_log_p(self):
+        return Descriptors.MolLogP(self.mol)
+    
+    def get_mol_mr(self):
+        return Descriptors.MolMR(self.mol)
 
     def make_retrostep(self, transform):
         """Returns unique reaction smiles obtained by retrosynthesis."""
