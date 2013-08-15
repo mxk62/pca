@@ -92,11 +92,8 @@ class Chemical:
                 mass += a.GetMass()
         return mass
     
-    def get_fraction_hetero_atoms(self):
-        total_atom = len(self.mol.GetAtoms())
-        hetero_atom = Descriptors.NumHeteroatoms(self.mol)
-        fraction = hetero_atom/total_atom
-        return hetero_atom
+    def get_num_hetero_atoms(self):
+        return Descriptors.NumHeteroatoms(self.mol)
     
     def get_fraction_rotatable_bonds(self):
         return Descriptors.NumRotatableBonds(self.mol)
