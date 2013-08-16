@@ -15,17 +15,72 @@ class Chemical:
             sys.exit(1)
         self.functional_groups = None
 
+    def count_H_acceptors(self):
+        return Descriptors.NumHAcceptors(self.mol)
+
+    def count_H_donors(self):
+        return Descriptors.NumHDonors(self.mol)
+
     def count_atoms(self):
         return len(self.mol.GetAtoms())
+
+    def count_hetero_atoms(self):
+        return Descriptors.NumHeteroatoms(self.mol)
 
     def count_bonds(self):
         return len(self.mol.GetBonds())
 
+    def get_fraction_rotatable_bonds(self):
+        return Descriptors.NumRotatableBonds(self.mol)
+
     def count_rings(self):
         return self.mol.GetRingInfo().NumRings()
 
-    def get_weight(self):
+    def count_aliphatic_rings(self):
+        return Descriptors.NumAliphaticRings(self.mol)
+
+    def count_aromatic_rings(self):
+        return Descriptors.NumAromaticRings(self.mol)
+
+    def count_saturated_rings(self):
+        return Descriptors.NumSaturatedRings(self.mol)
+
+    def count_aliphatic_carbocycles(self):
+        return Descriptors.NumAliphaticCarbocycles(self.mol)
+
+    def count_aliphatic_heterocycles(self):
+        return Descriptors.NumAliphaticHeterocycles(self.mol)
+
+    def count_aromatic_carbocycles(self):
+        return Descriptors.NumAromaticCarbocycles(self.mol)
+
+    def count_aromatic_heterocycles(self):
+        return Descriptors.NumAromaticHeterocycles(self.mol)
+
+    def count_saturated_carbocycles(self):
+        return Descriptors.NumSaturatedCarbocycles(self.mol)
+
+    def count_saturated_heterocycles(self):
+        return Descriptors.NumSaturatedHeterocycles(self.mol)
+
+    def count_valance_electrons(self):
+        return Descriptors.NumValenceElectrons(self.mol)
+
+    def count_radical_electrons(self):
+        return Descriptors.NumRadicalElectrons(self.mol)
+
+    def get_mass(self):
         return sum(a.GetMass() for a in self.mol.GetAtoms())
+
+    def get_heavy_atom_mass(self):
+        return Descriptors.HeavyAtomMolWt(self.mol)
+
+    def get_hetero_atom_mass(self):
+        mass = 0
+        for a in self.mol.GetAtoms():
+            if a.GetAtomicNum() != 6 and a.GetAtomicNum() != 1:
+                mass += a.GetMass()
+        return mass
 
     def get_randic(self):
         kappa = 0
@@ -48,68 +103,13 @@ class Chemical:
         k1 = Descriptors.Kappa1(self.mol)
         k2 = Descriptors.Kappa2(self.mol)
         return k1 * k2 / len(self.mol.GetAtoms())
-    
+
     def get_fraction_CSP3(self):
         return Descriptors.FractionCSP3(self.mol)
-    
-    def get_num_aliphatic_carbocycles(self):
-        return Descriptors.NumAliphaticCarbocycles(self.mol)
-    
-    def get_num_aliphatic_heterocycles(self):
-        return Descriptors.NumAliphaticHeterocycles(self.mol)
-    
-    def get_num_saturated_rings(self):
-        return Descriptors.NumSaturatedRings(self.mol)
-    
-    def get_num_saturated_heterocycles(self):
-        return Descriptors.NumSaturatedHeterocycles(self.mol)
-    
-    def get_num_saturated_carbocycles(self):
-        return Descriptors.NumSaturatedCarbocycles(self.mol)
-    
-    def get_num_aromatic_rings(self):
-        return Descriptors.NumAromaticRings(self.mol)
-    
-    def get_num_aromatic_heterocycles(self):
-        return Descriptors.NumAromaticHeterocycles(self.mol)
-    
-    def get_num_aromatic_carbocycles(self):
-        return Descriptors.NumAromaticCarbocycles(self.mol)
-    
-    def get_num_aliphatic_rings(self):
-        return Descriptors.NumAliphaticRings(self.mol)
-    
-    def get_num_H_donors(self):
-        return Descriptors.NumHDonors(self.mol)
-    
-    def get_num_H_acceptors(self):
-        return Descriptors.NumHAcceptors(self.mol)
-    
-    def get_hetero_atoms_mass(self):
-        mass = 0
-        for a in self.mol.GetAtoms():
-            if a.GetAtomicNum() != 6 and a.GetAtomicNum() != 1:
-                mass += a.GetMass()
-        return mass
-    
-    def get_num_hetero_atoms(self):
-        return Descriptors.NumHeteroatoms(self.mol)
-    
-    def get_fraction_rotatable_bonds(self):
-        return Descriptors.NumRotatableBonds(self.mol)
-    
-    def get_num_valance_electrons(self):
-        return Descriptors.NumValenceElectrons(self.mol)
-    
-    def get_num_radical_electrons(self):
-        return Descriptors.NumRadicalElectrons(self.mol)
-    
-    def get_heavy_atom_mol_wt(self):
-        return Descriptors.HeavyAtomMolWt(self.mol)
-    
+
     def get_mol_log_p(self):
         return Descriptors.MolLogP(self.mol)
-    
+
     def get_mol_mr(self):
         return Descriptors.MolMR(self.mol)
 
