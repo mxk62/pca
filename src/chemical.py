@@ -107,10 +107,10 @@ class Chemical:
     def get_fraction_CSP3(self):
         return Descriptors.FractionCSP3(self.mol)
 
-    def get_mol_log_p(self):
+    def get_logP(self):
         return Descriptors.MolLogP(self.mol)
 
-    def get_mol_mr(self):
+    def get_mr(self):
         return Descriptors.MolMR(self.mol)
 
     def make_retrostep(self, transform):

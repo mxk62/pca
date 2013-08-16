@@ -152,13 +152,13 @@ class Reaction:
         descriptors.extend([r_CSP3, p_CSP3])
 
         # Calculate Wildman-Crippen logP values.
-        r_log_p = sum(chem.get_mol_log_p() for chem in self.reactants)
-        p_log_p = sum(chem.get_mol_log_p() for chem in self.products)
+        r_log_p = sum(chem.get_logP() for chem in self.reactants)
+        p_log_p = sum(chem.get_logP() for chem in self.products)
         descriptors.extend([r_log_p, p_log_p])
 
         # Calculate Wildman-Crippen mr values.
-        r_mr = sum(chem.get_mol_mr() for chem in self.reactants)
-        p_mr = sum(chem.get_mol_mr() for chem in self.products)
+        r_mr = sum(chem.get_mr() for chem in self.reactants)
+        p_mr = sum(chem.get_mr() for chem in self.products)
         descriptors.extend([r_mr, p_mr])
 
         return descriptors
