@@ -99,10 +99,53 @@ class Chemical:
     def get_ipc(self):
         return Descriptors.IPC(self.mol)
 
+    def get_first_order_kappa(self):
+        return Descriptors.Kappa1(self.mol)
+
+    def get_second_order_kappa(self):
+        return Descriptors.Kappa2(self.mol)
+
+    def get_third_order_kappa(self):
+        return Descriptors.Kappa3(self.mol)
+
     def get_kier_flex(self):
         k1 = Descriptors.Kappa1(self.mol)
         k2 = Descriptors.Kappa2(self.mol)
         return k1 * k2 / len(self.mol.GetAtoms())
+
+    def get_first_zagreb(self):
+        """Returns first Zagreb index.
+
+        First Zagreb index is a topological index base on vertex degree
+        $\delta$:
+        \[
+            M_{1} = \sum_{i = 1}{A} \delta_{i}^{2}.
+        \]
+        """
+        return sum(pow(len(a.GetNeighbors()), 2) for a in self.mol.GetAtoms())
+
+    def get_second_zagreb(self):
+        """Returns second Zagreb index.
+
+        Second Zagreb index is a topological index base on vertex degree
+        $\delta$:
+        \[
+            M_{2} =
+                \sum_{i = 1}{A - 1}\sum_{j = i + 1}{A}
+                    a_{ij} \delta_{i} \delta{j}.
+        \]
+        where $a_{ij}$ are elemensts of adjacency matrix.
+        """
+        a = Chem.GetAdjacencyMatrix(self.mol)
+
+        natoms = len(self.mol.GetAtoms())
+        summ = 0
+        for i in range(natoms - 1):
+            di = len(self.mol.GetAtomWithIdx(i).GetNeighbors())
+            for j in range(i + 1, natoms):
+                dj = len(self.mol.GetAtomWithIdx(j).GetNeighbors())
+                summ += a[i][j] * di * dj
+        return summ
 
     def get_fraction_CSP3(self):
         return Descriptors.FractionCSP3(self.mol)
