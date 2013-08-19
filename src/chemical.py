@@ -316,7 +316,7 @@ class Chemical:
         q(ind) = 1.0 - (number of double bonds/number of atoms).
         """
         n_double = 0
-        n_atom = len[self.mol.GetAtoms()]
+        n_atom = len(self.mol.GetAtoms())
 
         for b in self.mol.GetBonds():
             if b.GetBondType() == BondType.DOUBLE:
