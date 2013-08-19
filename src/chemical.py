@@ -1,8 +1,7 @@
 import sys
 from rdkit import Chem
-from rdkit.Chem import Descriptors
-from rdkit.Chem import rdmolops
-
+from rdkit.Chem import Descriptors, rdmolops
+from rdkit.Chem.rdchem import BondType
 
 class Chemical:
     """Represents a chemical compound."""
@@ -177,7 +176,20 @@ class Chemical:
         
         w = 0.5 * w
         return w
-
+    
+    def get_induction_parameter(self):
+        """ Returns induction parameter of a molecule
+        q(ind) = 1.0 - (number of double bonds/number of atoms). 
+        """
+        n_double = 0
+        n_atom = len[self.mol.GetAtoms()]
+        
+        for b in self.mol.GetBonds():
+            if b.GetBondType() == BondType.DOUBLE:
+                n_double += 1
+        q = 1.0 -(n_double/n_atom)
+        return q
+    
     def make_retrostep(self, transform):
         """Returns unique reaction smiles obtained by retrosynthesis."""
 

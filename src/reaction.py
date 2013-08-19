@@ -142,7 +142,7 @@ class Reaction:
         p_balaban = sum(chem.get_balaban() for chem in self.products)
         descriptors.extend([r_balaban, p_balaban])
 
-        # Calculate Bert indices.
+        # Calculate Bertz indices.
         r_bertz = sum(chem.get_bertz() for chem in self.reactants)
         p_bertz = sum(chem.get_bertz() for chem in self.products)
         descriptors.extend([r_bertz, p_bertz])
@@ -171,13 +171,18 @@ class Reaction:
         r_mr = sum(chem.get_mr() for chem in self.reactants)
         p_mr = sum(chem.get_mr() for chem in self.products)
         descriptors.extend([r_mr, p_mr])
-
+        
+        # Calculate induction parameter of molecule.
+        r_induction_parameter = sum(chem.get_induction_parameter() for chem in self.reactants)
+        p_induction_parameter = sum(chem.get_induction_parameter() for chem in self.products)
+        descriptors.extend([r_induction_parameter, p_induction_parameter])
+        
         return descriptors
 
     def get_group_descriptor(self, groups):
         """Return descriptor based on functional group count.
 
-        Function returns a vector which elemnts indicates how many functional
+        Function returns a vector which elements indicates how many functional
         group of a given type are present in reaction's reactants.
         """
         group_count = {}
