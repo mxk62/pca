@@ -147,6 +147,147 @@ class Chemical:
                 summ += a[i][j] * di * dj
         return summ
 
+    def get_eccentric_connectivity(self):
+        """Returns eccentric connectivity index.
+
+        Eccentric connectivity index of a H-depleted molecule graph is defined
+        as
+        \[
+            \zeta^{c} = \sum_{i = 1}^{A} \eta_{i} \delta_{i}
+        \]
+        where $\eta_{i}$ is the eccentricity ($\max_{j}(d_{ij})$) of $i$-th
+        atom and $\delta_{i}$ is the vertex degree of vertex $v_{i}$.
+        """
+        a = Chem.GetAdjacencyMatrix(self.mol)
+        d = Chem.GetDistanceMatrix(self.mol)
+        return sum(max(d[i]) * sum(a[i]) for i in range(a.shape[0]))
+
+    def get_eccentric_distance_sum(self):
+        """Returns eccentric distance sum index.
+
+        Eccentric distance sum of a H-depleted molecule graph is defined
+        as
+        \[
+            \zeta^{DS} = \sum_{i = 1}^{A} \eta_{i} \sigma_{i}
+        \]
+        where $\eta_{i}$ is the eccentricity ($\max_{j}(d_{ij})$) of $i$-th
+        atom and $\sigma_{i}$ is the distance degree of vertex $v_{i}$.
+        """
+        d = Chem.GetDistanceMatrix(self.mol)
+        return sum(max(d[i]) * sum(d[i]) for i in range(d.shape[0]))
+
+    def get_adjacent_eccentric_distance_sum(self):
+        """Returns adjacent eccentric distance sum index.
+
+        Adjacent eccentric distance sum index of a H-depleted molecule graph is
+        defined as
+        \[
+            \zeta^{SV} = \sum_{i = 1}^{A}
+                \frac{\eta_{i} \sigma_{i}}{\delta_{i}}
+        \]
+        where $\eta_{i}$ is the eccentricity ($\max_{j}(d_{ij})$) of $i$-th
+        atom, $\sigma_{i}$ and $\delta_{i}$ are the distance and is vertex
+        degree of the vertex $v_{i}$ respectively.
+        """
+        a = Chem.GetAdjacencyMatrix(self.mol)
+        d = Chem.GetDistanceMatrix(self.mol)
+        return sum(max(d[i]) * sum(d[i]) / sum(a[i])
+                   for i in range(a.shape[0]))
+
+    def get_connective_eccentricity(self):
+        """Returns connective eccentricity index.
+
+        Connective eccentricity index of a H-depleted molecule graph is defined
+        as
+        \[
+            C^{\zeta} = \sum_{i = 1}^{A} \frac{\delta_{i}}{\eta_{i}}
+        \]
+        where $\eta_{i}$ and $\delta_{i}$ are the eccentricity
+        ($\max_{j}(d_{ij})$) and vertex degree of vertex $v_{i}$ respectively.
+        """
+        a = Chem.GetAdjacencyMatrix(self.mol)
+        d = Chem.GetDistanceMatrix(self.mol)
+        return sum(sum(a[i]) / max(d[i]) for i in range(a.shape[0]))
+
+    def get_eccentric_adjacency(self):
+        """Returns eccentric adjacency index.
+
+        Eccentric adjacency index of a H-depleted molecule graph is defined
+        as
+        \[
+            \zeta^{A} = \sum_{i = 1}^{A} \frac{EC_{i}^{1}}{\eta_{i}}
+        \]
+        where $\eta_{i}$ and $EC_{i}^{1}$ are the eccentricity
+        ($\max_{j}(d_{ij})$) and vertex degree and extended connectivity of
+        fisrt order of vertex $v_{i}$ respectively.
+
+        Extended connectivity is defined as
+        \[
+            EC_{i}^{k + 1} = \sum_{j = 1}^{A} a_{ij} EC_{j}^{k}
+        \]
+        where $EC_{j}^{0}$ is the vertex degree of vertex $v_{j}$.
+        """
+        a = Chem.GetAdjacencyMatrix(self.mol)
+        d = Chem.GetDistanceMatrix(self.mol)
+
+        summ = 0.0
+        for i in range(a.shape[0]):
+            eci = sum(a[i][j] * sum(a[j]) for j in range(a.shape[0]))
+            summ += eci / max(d[i])
+        return summ
+
+    def get_superadjacency(self):
+        """Returns superadjacency index.
+
+        Eccentric adjacency index of a H-depleted molecule graph is defined
+        as
+        \[
+            \int^{A} = \sum_{i = 1}^{A} \frac{EC_{i}^{1} \delta_{i}}{\eta_{i}}
+        \]
+        where $\eta_{i}$, $EC_{i}^{1}$, and $delta_{I} are the eccentricity
+        ($\max_{j}(d_{ij})$), extended connectivity of first orederm, and
+        vertex degree of vertex $v_{i}$ respectively.
+
+        Extended connectivity is defined as
+        \[
+            EC_{i}^{k + 1} = \sum_{j = 1}^{A} a_{ij} EC_{j}^{k}
+        \]
+        where $EC_{j}^{0}$ is the vertex degree of vertex $v_{j}$.
+        """
+        a = Chem.GetAdjacencyMatrix(self.mol)
+        d = Chem.GetDistanceMatrix(self.mol)
+
+        summ = 0.0
+        for i in range(a.shape[0]):
+            eci = sum(a[i][j] * sum(a[j]) for j in range(a.shape[0]))
+            summ += sum(a[i]) * eci / max(d[i])
+        return summ
+
+    def get_augmented_eccentric_connectivity(self):
+        """Returns augmented eccentric connectivity index.
+
+        Eccentric adjacency index of a H-depleted molecule graph is defined
+        as
+        \[
+            ^{A}\zeta^{c} = \sum_{i = 1}^{A} \frac{M_{i}^{1}}{\eta_{i}}
+        \]
+        where $\eta_{i}$ is the eccentricity ($\max_{j}(d_{ij})$) and
+        \[
+            $M_{i} = \prod_{j = 1}^{A} (\delta_{j})^{a_{ij}}
+        \]
+        with $\delta_{j}$ being the vertex degree of vertex $v_{j}$.
+        """
+        a = Chem.GetAdjacencyMatrix(self.mol)
+        d = Chem.GetDistanceMatrix(self.mol)
+
+        summ = 0.0
+        for i in range(a.shape[0]):
+            mi = 1
+            for j in range(a.shape[0]):
+                mi *= pow(sum(a[j]), a[i][j])
+            summ += mi / max(d[i])
+        return summ
+
     def get_fraction_CSP3(self):
         return Descriptors.FractionCSP3(self.mol)
 
