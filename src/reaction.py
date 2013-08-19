@@ -140,6 +140,11 @@ class Reaction:
         r_bertz = sum(chem.get_bertz() for chem in self.reactants)
         p_bertz = sum(chem.get_bertz() for chem in self.products)
         descriptors.extend([r_bertz, p_bertz])
+        
+        # Calculate Wiener indices.
+        r_wiener = sum(chem.get_wiener() for chem in self.reactants)
+        p_wiener = sum(chem.get_wiener() for chem in self.products)
+        descriptors.extend([r_wiener, p_wiener])
 
         # Calculate Kier flexibility indices.
         r_kier_flex = sum(chem.get_kier_flex() for chem in self.reactants)

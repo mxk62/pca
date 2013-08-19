@@ -1,6 +1,7 @@
 import sys
 from rdkit import Chem
 from rdkit.Chem import Descriptors
+from rdkit.Chem import rdmolops
 
 
 class Chemical:
@@ -155,6 +156,27 @@ class Chemical:
 
     def get_mr(self):
         return Descriptors.MolMR(self.mol)
+    
+    def get_wiener(self):
+        """ Returns Wiener index (W).
+        W = Wi (D) = 0.5 * sum over i(sum over j(d))
+        where Wi is Wiener operator, D is distance martix of molecule
+        
+        d(ij) is the number of bonds between ith and jth atom in the molecule.
+        """
+        # Initialize Wiener index.
+        w = 0
+        
+        #Get distance matrix of the molecule.
+        d = rdmolops.GetDistanceMatrix(self.mol)
+        
+        #calculate Wiener index.
+        for row in d:
+            for e in row:
+                w  += e
+        
+        w = 0.5 * w
+        return w
 
     def make_retrostep(self, transform):
         """Returns unique reaction smiles obtained by retrosynthesis."""
