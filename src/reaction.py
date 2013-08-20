@@ -257,20 +257,25 @@ class Reaction:
         p_MCD = sum(chem.get_MCD() for chem in self.products)
         descriptors.extend([r_MCD, p_MCD])
         
-        # Calculate total information content.
+        # Calculate ring complexity index.
+        r_rc = sum(chem.get_rc() for chem in self.reactants)
+        p_rc = sum(chem.get_rc() for chem in self.products)
+        descriptors.extend([r_rc, p_rc])
+        
+        """# Calculate total information content.
         r_TIC = sum(chem.get_total_information_content() for chem in self.reactants)
         p_TIC = sum(chem.get_total_information_content() for chem in self.products)
-        descriptors.extend([r_TIC, p_TIC])
+        descriptors.extend([r_TIC, p_TIC])"""
         
         # Calculate total information on atomic composition.
         r_TI_atom_comp = sum(chem.get_total_information_on_atomic_composition() for chem in self.reactants)
         p_TI_atom_comp = sum(chem.get_total_information_on_atomic_composition() for chem in self.reactants)
         descriptors.extend([r_TI_atom_comp, p_TI_atom_comp])
         
-        # Calculate information bond index.
+        """# Calculate information bond index.
         r_info_bond = sum(chem.get_information_bond() for chem in self.reactants)
         p_info_bond = sum(chem.get_information_bond() for chem in self.products)
-        descriptors.extend([r_info_bond, p_info_bond])
+        descriptors.extend([r_info_bond, p_info_bond])"""
         
         return descriptors
 

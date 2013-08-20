@@ -379,8 +379,24 @@ class Chemical:
         for a in self.mol.GetAtoms():
             if a.IsInRing():
                 Ar += 1
-        MCD = Ar/A
-        return MCD        
+        MCD = Ar / float(A)
+        return MCD
+    
+    def get_rc(self):
+        """Returns ring complexity index"""
+        R = 0
+        Ar = 0
+        ri = self.mol.GetRingInfo()
+        for a in self.mol.GetAtoms():
+            i = RingInfo.NumAtomRings(ri,a.GetIdx())
+            R += i
+            if a.IsInRing():
+                Ar += 1
+        if Ar == 0:
+            rc = 0
+        else:
+            rc = R / float(Ar)
+        return rc        
     
     def get_total_information_content(self):
         """Returns total information content on the adjacency equality.
