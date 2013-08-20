@@ -391,7 +391,7 @@ class Chemical:
                 (A^{2} - 2 B) \log_{2}(A^2 - 2 B)
         \]
         """
-        a = self.mol.GetAdjacencyMatrix()
+        a = Chem.GetAdjacencyMatrix(self.mol)
         nv = len(a)
         nvsqr = math.pow(nv, 2)
         ne = numpy.sum(a) / 2
