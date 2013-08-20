@@ -147,15 +147,55 @@ class Reaction:
         p_bertz = sum(chem.get_bertz() for chem in self.products)
         descriptors.extend([r_bertz, p_bertz])
         
-        # Calculate Wiener indices.
-        r_wiener = sum(chem.get_wiener() for chem in self.reactants)
-        p_wiener = sum(chem.get_wiener() for chem in self.products)
-        descriptors.extend([r_wiener, p_wiener])
-
         # Calculate Kier flexibility indices.
         r_kier_flex = sum(chem.get_kier_flex() for chem in self.reactants)
         p_kier_flex = sum(chem.get_kier_flex() for chem in self.products)
         descriptors.extend([r_kier_flex, p_kier_flex])
+        
+        # Calculate first Zagreb index.
+        r_first_zagreb = sum(chem.get_first_zagreb() for chem in self.reactants)
+        p_first_zagreb = sum(chem.get_first_zagreb() for chem in self.products)
+        descriptors.extend([r_first_zagreb, p_first_zagreb])
+        
+        #Calculate second Zagreb index.
+        r_second_zagreb = sum(chem.get_second_zagreb() for chem in self.reactants)
+        p_second_zagreb = sum(chem.get_second_zagreb() for chem in self.products)
+        descriptors.extend([r_second_zagreb, p_second_zagreb])
+        
+        # Calculate eccentric connectivity.
+        r_e_connectivity = sum(chem.get_eccentric_connectivity() for chem in self.reactants)
+        p_e_connectivity = sum(chem.get_eccentric_connectivity() for chem in self.products)
+        descriptors.extend([r_e_connectivity, p_e_connectivity])
+        
+        # Calculate eccentric distance sum.
+        r_e_distance = sum(chem.get_eccentric_distance_sum() for chem in self.reactants)
+        p_e_distance = sum(chem.get_eccentric_distance_sum() for chem in self.products)
+        descriptors.extend([r_e_distance, p_e_distance])
+        
+        # Calculate adjacent eccentric distance sum.
+        r_adjacent_e_distance = sum(chem.get_adjacent_eccentric_distance_sum() for chem in self.reactants)
+        p_adjacent_e_distance = sum(chem.get_adjacent_eccentric_distance_sum() for chem in self.products)
+        descriptors.extend([r_adjacent_e_distance, p_adjacent_e_distance])
+        
+        # Calculate connective eccentricity.
+        r_connective_e = sum(chem.get_connective_eccentricity() for chem in self.reactants)
+        p_connective_e = sum(chem.get_connective_eccentricity() for chem in self.products)
+        descriptors.extend([r_connective_e, p_connective_e])
+        
+        # Calculate eccentric adjacency.
+        r_e_adjacency = sum(chem.get_eccentric_adjacency() for chem in self.reactants)
+        p_e_adjacency = sum(chem.get_eccentric_adjacency() for chem in self.products)
+        descriptors.extend([r_e_adjacency, p_e_adjacency])
+        
+        # Calculate super adjacency.
+        r_super_adjacency = sum(chem.get_superadjacency() for chem in self.reactants)
+        p_super_adjacency = sum(chem.get_superadjacency() for chem in self.products)
+        descriptors.extend([r_super_adjacency, p_super_adjacency])
+        
+        # Calculate augmented eccentric connectivity.
+        r_augmented_e_connectivity = sum(chem.get_augmented_eccentric_connectivity() for chem in self.reactants)
+        p_augmented_e_connectivity = sum(chem.get_augmented_eccentric_connectivity() for chem in self.products)
+        descriptors.extend([r_augmented_e_connectivity, p_augmented_e_connectivity])
 
         # Calculate fraction of C atoms SP3 hybridized.
         r_CSP3 = sum(chem.get_fraction_CSP3() for chem in self.reactants)
@@ -172,6 +212,16 @@ class Reaction:
         p_mr = sum(chem.get_mr() for chem in self.products)
         descriptors.extend([r_mr, p_mr])
         
+        # Calculate Schultz indices.
+        r_schultz = sum(chem.get_schultz() for chem in self.reactants)
+        p_schultz = sum(chem.get_schultz() for chem in self.products)
+        descriptors.extend([r_schultz, p_schultz])        
+        
+        # Calculate Wiener indices.
+        r_wiener = sum(chem.get_wiener() for chem in self.reactants)
+        p_wiener = sum(chem.get_wiener() for chem in self.products)
+        descriptors.extend([r_wiener, p_wiener])
+        
         # Calculate induction parameter of molecule.
         r_induction_parameter = sum(chem.get_induction_parameter() for chem in self.reactants)
         p_induction_parameter = sum(chem.get_induction_parameter() for chem in self.products)
@@ -186,6 +236,21 @@ class Reaction:
         r_RF = sum(chem.get_RF_delta() for chem in self.reactants)
         p_RF = sum(chem.get_RF_delta() for chem in self.products)
         descriptors.extend([r_RF, p_RF])
+        
+        # Calculate total information content.
+        r_TIC = sum(chem.get_total_information_content() for chem in self.reactants)
+        p_TIC = sum(chem.get_total_information_content() for chem in self.products)
+        descriptors.extend([r_TIC, p_TIC])
+        
+        # Calculate total information on atomic composition.
+        r_TI_atom_comp = sum(chem.get_total_information_on_atomic_composition() for chem in self.reactants)
+        r_TI_atom_comp = sum(chem.get_total_information_on_atomic_composition() for chem in self.reactants)
+        descriptors.extend([r_TI_atom_comp, p_TI_atom_comp])
+        
+        # Calculate information bond index.
+        r_info_bond = sum(chem.get_information_bond() for chem in self.reactants)
+        p_info_bond = sum(chem.get_information_bond() for chem in self.products)
+        descriptors.extend([r_info_bond, p_info_bond])
         
         return descriptors
 
