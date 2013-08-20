@@ -182,6 +182,11 @@ class Reaction:
         p_TPSA = sum(chem.get_TPSA() for chem in self.products)
         descriptors.extend([r_TPSA, p_TPSA])
         
+        # Calculate ring fusion density
+        r_RF = sum(chem.get_RF_delta() for chem in self.reactants)
+        p_RF = sum(chem.get_RF_delta() for chem in self.products)
+        descriptors.extend([r_RF, p_RF])
+        
         return descriptors
 
     def get_group_descriptor(self, groups):

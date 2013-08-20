@@ -100,7 +100,7 @@ class Chemical:
         return Descriptors.BertzCT(self.mol)
 
     def get_ipc(self):
-        return Descriptors.IPC(self.mol)
+        return Descriptors.Ipc(self.mol)
 
     def get_first_order_kappa(self):
         return Descriptors.Kappa1(self.mol)
@@ -348,7 +348,30 @@ class Chemical:
 
     def get_TPSA(self):
         return Descriptors.TPSA(self.mol)
-
+    
+    def get_RF_delta(self):
+        """Returns ring fusion density of a molecule
+        RF_delta = 2*(Rb/Ar) 
+        where Rb is number of ring bridges and Ar is 
+        the total number of atoms belonging to ring systems.
+        """
+        #Calculate number of ring bridges.
+        Rb = 0
+        ri = self.mol.GetRingInfo()
+        for b in self.mol.GetBonds():
+            if RingInfo.NumBondRings(ri, b.GetIdx()) > 1:
+                Rb += 1
+        # Calculate number of atoms in ring systems.
+        Ar = 0        
+        for a in self.mol.GetAtoms():
+            if a.IsInRing():
+                Ar += 1
+        if Ar ==0:
+            RF_delta = 0
+        else:
+            RF_delta = 2*Rb/Ar
+        return RF_delta
+    
     def get_total_information_content(self):
         """Returns total information content on the adjacency equality.
 
