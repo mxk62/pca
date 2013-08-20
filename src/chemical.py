@@ -3,7 +3,7 @@ import numpy
 import sys
 from rdkit import Chem
 from rdkit.Chem import Descriptors
-from rdkit.Chem.rdchem import BondType
+from rdkit.Chem.rdchem import BondType, RingInfo
 
 
 class Chemical:
@@ -371,6 +371,16 @@ class Chemical:
         else:
             RF_delta = 2*Rb/Ar
         return RF_delta
+    
+    def get_MCD(self):
+        """Returns molecular cyclized degree."""
+        A = self.mol.GetNumAtoms()
+        Ar = 0
+        for a in self.mol.GetAtoms():
+            if a.IsInRing():
+                Ar += 1
+        MCD = Ar/A
+        return MCD        
     
     def get_total_information_content(self):
         """Returns total information content on the adjacency equality.

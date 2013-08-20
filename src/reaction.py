@@ -252,6 +252,11 @@ class Reaction:
         p_RF = sum(chem.get_RF_delta() for chem in self.products)
         descriptors.extend([r_RF, p_RF])
         
+        # Calculate molecular cyclized degree.
+        r_MCD = sum(chem.get_MCD() for chem in self.reactants)
+        p_MCD = sum(chem.get_MCD() for chem in self.products)
+        descriptors.extend([r_MCD, p_MCD])
+        
         # Calculate total information content.
         r_TIC = sum(chem.get_total_information_content() for chem in self.reactants)
         p_TIC = sum(chem.get_total_information_content() for chem in self.products)
