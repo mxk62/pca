@@ -227,10 +227,10 @@ class Reaction:
         p_mr = sum(chem.get_mr() for chem in self.products)
         descriptors.extend([r_mr, p_mr])
         
-        # Calculate Schultz indices.
+        """# Calculate Schultz indices.
         r_schultz = sum(chem.get_schultz() for chem in self.reactants)
         p_schultz = sum(chem.get_schultz() for chem in self.products)
-        descriptors.extend([r_schultz, p_schultz])        
+        descriptors.extend([r_schultz, p_schultz])"""        
         
         # Calculate Wiener indices.
         r_wiener = sum(chem.get_wiener() for chem in self.reactants)
@@ -264,7 +264,7 @@ class Reaction:
         
         # Calculate total information on atomic composition.
         r_TI_atom_comp = sum(chem.get_total_information_on_atomic_composition() for chem in self.reactants)
-        r_TI_atom_comp = sum(chem.get_total_information_on_atomic_composition() for chem in self.reactants)
+        p_TI_atom_comp = sum(chem.get_total_information_on_atomic_composition() for chem in self.reactants)
         descriptors.extend([r_TI_atom_comp, p_TI_atom_comp])
         
         # Calculate information bond index.
