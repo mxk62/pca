@@ -125,12 +125,6 @@ class Reaction:
         r_hetero_atom_mass = sum(chem.get_hetero_atom_mass() for chem in self.reactants)
         p_hetero_atom_mass = sum(chem.get_hetero_atom_mass() for chem in self.products)
         descriptors.extend([r_hetero_atom_mass, p_hetero_atom_mass])
-
-        # Calculate information content of the coefficients of the
-        #characteristic polynomial of adjancency matrix.
-        r_ipc = sum(chem.get_ipc() for chem in self.reactants)
-        p_ipc = sum(chem.get_ipc() for chem in self.products)
-        descriptors.extend([r_ipc, p_ipc])
         
         # Calculate Randic indices.
         r_randic = sum(chem.get_randic() for chem in self.reactants)
@@ -146,6 +140,27 @@ class Reaction:
         r_bertz = sum(chem.get_bertz() for chem in self.reactants)
         p_bertz = sum(chem.get_bertz() for chem in self.products)
         descriptors.extend([r_bertz, p_bertz])
+
+        # Calculate information content of the coefficients of the
+        #characteristic polynomial of adjancency matrix.
+        r_ipc = sum(chem.get_ipc() for chem in self.reactants)
+        p_ipc = sum(chem.get_ipc() for chem in self.products)
+        descriptors.extend([r_ipc, p_ipc])
+        
+        # Calculate first order kappa.
+        r_kappa_1 = sum(chem.get_first_order_kappa() for chem in self.reactants)
+        p_kappa_1 = sum(chem.get_first_order_kappa() for chem in self.products)
+        descriptors.extend([r_kappa_1, p_kappa_1])
+        
+        # Calculate second order kappa.
+        r_kappa_2 = sum(chem.get_second_order_kappa() for chem in self.reactants)
+        p_kappa_2 = sum(chem.get_second_order_kappa() for chem in self.products)
+        descriptors.extend([r_kappa_2, p_kappa_2])
+        
+        # Calculate third order kappa.
+        r_kappa_3 = sum(chem.get_third_order_kappa() for chem in self.reactants)
+        p_kappa_3 = sum(chem.get_third_order_kappa() for chem in self.products)
+        descriptors.extend([r_kappa_3, p_kappa_3])
         
         # Calculate Kier flexibility indices.
         r_kier_flex = sum(chem.get_kier_flex() for chem in self.reactants)
