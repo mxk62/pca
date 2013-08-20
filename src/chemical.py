@@ -337,14 +337,17 @@ class Chemical:
         q(ind) = 1.0 - (number of double bonds/number of atoms).
         """
         n_double = 0
-        n_atom = len[self.mol.GetAtoms()]
+        n_atom = len(self.mol.GetAtoms())
 
         for b in self.mol.GetBonds():
             if b.GetBondType() == BondType.DOUBLE:
                 n_double += 1
         q = 1.0 - (n_double / n_atom)
         return q
-
+    
+    def get_TPSA(self):
+        return Descriptors.TPSA(self.mol)
+    
     def make_retrostep(self, transform):
         """Returns unique reaction smiles obtained by retrosynthesis."""
 

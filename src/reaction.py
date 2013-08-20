@@ -177,6 +177,11 @@ class Reaction:
         p_induction_parameter = sum(chem.get_induction_parameter() for chem in self.products)
         descriptors.extend([r_induction_parameter, p_induction_parameter])
         
+        # Calculate Topological Polar Surface Area of molecule.
+        r_TPSA = sum(chem.get_TPSA() for chem in self.reactants)
+        p_TPSA = sum(chem.get_TPSA() for chem in self.products)
+        descriptors.extend([r_TPSA, p_TPSA])
+        
         return descriptors
 
     def get_group_descriptor(self, groups):
