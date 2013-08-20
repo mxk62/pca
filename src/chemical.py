@@ -1,3 +1,4 @@
+import math
 import numpy
 import sys
 from rdkit import Chem
@@ -347,6 +348,75 @@ class Chemical:
 
     def get_TPSA(self):
         return Descriptors.TPSA(self.mol)
+
+    def get_total_information_content(self):
+        """Returns total information content on the adjacency equality.
+
+        The total information content on the adjacency equality is definde as
+        \[
+            ^{V}I_{adj}^{E} = A^{2} \log_{2}A^{2} - 2 B \log_{2}2B -
+                (A^{2} - 2 B) \log_{2}(A^2 - 2 B)
+        \]
+        """
+        a = self.mol.GetAdjacencyMatrix()
+        nv = len(a)
+        nvsqr = math.pow(nv, 2)
+        ne = numpy.sum(a) / 2
+        return (nvsqr * math.log(nvsqr, 2) - 2 * ne * math.log(2 * ne, 2) -
+                (nvsqr - 2 * ne) * math.log(nvsqr - 2 * ne, 2))
+
+    def get_total_information_on_atomic_composition(self):
+        """Returns total information index on atomic composition.
+
+        Information index on atomic composition is defined as
+        \[
+            I_{AC} = A^{h} \log_{2}A^{h} - \sum_{g = 1}^{G} A_{g} \log_{2}A_{g}
+        \]
+        where $A^{h}$ is the total number of atoms (hydrogen included) in a
+        molecule and $A_{g}$ is the number of atoms of chemical element of type
+        $g$.
+        """
+        atoms = self.mol.GetAtoms()
+        natoms = len(atoms)
+        nhs = 0
+
+        # Count atoms of different types (including hydrogens).
+        atypes = {}
+        for a in atoms:
+            atype = a.GetSymbol().upper()
+            atypes.setdefault(atype, 0)
+            atypes[atype] += 1
+
+            nhs += a.GetTotalNumHs()
+
+        return ((natoms + nhs) * math.log(natoms + nhs, 2) -
+                sum(atypes[key] * math.log(atypes[key], 2)
+                    for key in atypes.keys()))
+
+    def get_information_bond(self):
+        """Returns information bond index.
+
+        Information bond index is defined as
+        \[
+            I_{B} = B \log_{2}B - \sum_{g = 1}^{G} B_{g} \log_{2}B_{g}
+        \]
+        where $B$ is the number of bonds in a molecule and $B_{g}$ is the
+        number of bonds of type $g$; summation goes over all $G$ different
+        types of bond in the molecule (single, double, triple, aromatic).
+        """
+        bonds = self.mol.GetBonds()
+        nbonds = len(bonds)
+
+        # Count bonds of different types.
+        btypes = {}
+        for b in bonds:
+            btype = b.GetBondType()
+            btypes.setdefault(btype, 0)
+            btypes[btype] += 1
+
+        return (nbonds * math.log(nbonds, 2) -
+                sum(btypes[key] * math.log(btypes[key], 2)
+                    for key in btypes.keys()))
 
     def make_retrostep(self, transform):
         """Returns unique reaction smiles obtained by retrosynthesis."""
