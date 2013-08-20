@@ -1,6 +1,7 @@
 import numpy
 import sys
 from rdkit import Chem
+from rdkit.Chem import Descriptors
 from rdkit.Chem.rdchem import BondType
 
 
@@ -298,6 +299,26 @@ class Chemical:
     def get_mr(self):
         return Descriptors.MolMR(self.mol)
 
+    def get_schultz(self):
+        """Returns Schultz molecular topological index.
+
+        Schultz molecular topological index is defined as
+        \[
+            MTI = \sum_{i = 1}^{A}
+                [(\mathbf(A) + \mathbf(D)) \dot \mathbf{v}]_{i} =
+                    \sum_{i = 1}^{A} t_{i}
+        \]
+        with $\mathbf{A}$, $\mathbf{D}$ being adjacency and distance matrix
+        respectively, and $\mathbf{v}$ being  $A$-dimensional column vector
+        constitued by the vertex degrees of the atoms in the H-depleted
+        molecular graph.
+        """
+        a = Chem.GetAdjacencyMatrix(self.mol)
+        d = Chem.GetDistanceMatrix(self.mol)
+
+        v = numpy.sum(a, axis=(1,))
+        return numpy.sum(numpy.dot(numpy.sum(a, d), v))
+
     def get_wiener(self):
         """Returns Wiener index.
 
@@ -321,7 +342,7 @@ class Chemical:
         for b in self.mol.GetBonds():
             if b.GetBondType() == BondType.DOUBLE:
                 n_double += 1
-        q = 1.0 -(n_double/n_atom)
+        q = 1.0 - (n_double / n_atom)
         return q
 
     def make_retrostep(self, transform):
