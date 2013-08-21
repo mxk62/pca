@@ -16,6 +16,8 @@ class Chemical:
         except Exception:
             print 'Error: invalid compound SMILES: {}.'.format(self.smiles)
             sys.exit(1)
+        self.a = Chem.GetAdjacencyMatrix(self.mol)
+        self.d = Chem.GetDistanceMatrix(self.mol)
         self.functional_groups = None
 
     def count_H_acceptors(self):
@@ -139,15 +141,13 @@ class Chemical:
         \]
         where $a_{ij}$ are elemensts of adjacency matrix.
         """
-        a = Chem.GetAdjacencyMatrix(self.mol)
+        deltas = numpy.sum(self.a, axis=(1,))
+        natoms = len(self.a)
 
-        natoms = len(self.mol.GetAtoms())
         summ = 0
         for i in range(natoms - 1):
-            di = len(self.mol.GetAtomWithIdx(i).GetNeighbors())
             for j in range(i + 1, natoms):
-                dj = len(self.mol.GetAtomWithIdx(j).GetNeighbors())
-                summ += a[i][j] * di * dj
+                summ += self.a[i][j] * deltas[i] * deltas[j]
         return summ
 
     def get_eccentric_connectivity(self):
@@ -161,9 +161,7 @@ class Chemical:
         where $\eta_{i}$ is the eccentricity ($\max_{j}(d_{ij})$) of $i$-th
         atom and $\delta_{i}$ is the vertex degree of vertex $v_{i}$.
         """
-        a = Chem.GetAdjacencyMatrix(self.mol)
-        d = Chem.GetDistanceMatrix(self.mol)
-        return sum(max(d[i]) * sum(a[i]) for i in range(a.shape[0]))
+        return sum(max(self.d[i]) * sum(self.a[i]) for i in range(len(self.a)))
 
     def get_eccentric_distance_sum(self):
         """Returns eccentric distance sum index.
@@ -176,8 +174,7 @@ class Chemical:
         where $\eta_{i}$ is the eccentricity ($\max_{j}(d_{ij})$) of $i$-th
         atom and $\sigma_{i}$ is the distance degree of vertex $v_{i}$.
         """
-        d = Chem.GetDistanceMatrix(self.mol)
-        return sum(max(d[i]) * sum(d[i]) for i in range(d.shape[0]))
+        return sum(max(self.d[i]) * sum(self.d[i]) for i in range(len(self.d)))
 
     def get_adjacent_eccentric_distance_sum(self):
         """Returns adjacent eccentric distance sum index.
@@ -192,10 +189,8 @@ class Chemical:
         atom, $\sigma_{i}$ and $\delta_{i}$ are the distance and is vertex
         degree of the vertex $v_{i}$ respectively.
         """
-        a = Chem.GetAdjacencyMatrix(self.mol)
-        d = Chem.GetDistanceMatrix(self.mol)
-        return sum(max(d[i]) * sum(d[i]) / sum(a[i])
-                   for i in range(a.shape[0]))
+        return sum(max(self.d[i]) * sum(self.d[i]) / sum(self.a[i])
+                   for i in range(len(self.a)))
 
     def get_connective_eccentricity(self):
         """Returns connective eccentricity index.
@@ -208,9 +203,7 @@ class Chemical:
         where $\eta_{i}$ and $\delta_{i}$ are the eccentricity
         ($\max_{j}(d_{ij})$) and vertex degree of vertex $v_{i}$ respectively.
         """
-        a = Chem.GetAdjacencyMatrix(self.mol)
-        d = Chem.GetDistanceMatrix(self.mol)
-        return sum(sum(a[i]) / max(d[i]) for i in range(a.shape[0]))
+        return sum(sum(self.a[i]) / max(self.d[i]) for i in range(len(self.a)))
 
     def get_eccentric_adjacency(self):
         """Returns eccentric adjacency index.
@@ -230,13 +223,12 @@ class Chemical:
         \]
         where $EC_{j}^{0}$ is the vertex degree of vertex $v_{j}$.
         """
-        a = Chem.GetAdjacencyMatrix(self.mol)
-        d = Chem.GetDistanceMatrix(self.mol)
+        natoms = len(self.a)
 
         summ = 0.0
-        for i in range(a.shape[0]):
-            eci = sum(a[i][j] * sum(a[j]) for j in range(a.shape[0]))
-            summ += eci / max(d[i])
+        for i in range(natoms):
+            eci = sum(self.a[i][j] * sum(self.a[j]) for j in range(natoms))
+            summ += eci / max(self.d[i])
         return summ
 
     def get_superadjacency(self):
@@ -257,12 +249,11 @@ class Chemical:
         \]
         where $EC_{j}^{0}$ is the vertex degree of vertex $v_{j}$.
         """
-        a = Chem.GetAdjacencyMatrix(self.mol)
-        d = Chem.GetDistanceMatrix(self.mol)
+        natoms = len(self.a)
 
         summ = 0.0
         for i in range(a.shape[0]):
-            eci = sum(a[i][j] * sum(a[j]) for j in range(a.shape[0]))
+            eci = sum(a[i][j] * sum(a[j]) for j in range(natoms))
             summ += sum(a[i]) * eci / max(d[i])
         return summ
 
@@ -280,15 +271,13 @@ class Chemical:
         \]
         with $\delta_{j}$ being the vertex degree of vertex $v_{j}$.
         """
-        a = Chem.GetAdjacencyMatrix(self.mol)
-        d = Chem.GetDistanceMatrix(self.mol)
-
+        natoms = len(self.a)
         summ = 0.0
-        for i in range(a.shape[0]):
+        for i in range(natoms):
             mi = 1
-            for j in range(a.shape[0]):
-                mi *= pow(sum(a[j]), a[i][j])
-            summ += mi / max(d[i])
+            for j in range(natoms):
+                mi *= pow(sum(self.a[j]), self.a[i][j])
+            summ += mi / max(self.d[i])
         return summ
 
     def get_fraction_CSP3(self):
@@ -314,11 +303,8 @@ class Chemical:
         constitued by the vertex degrees of the atoms in the H-depleted
         molecular graph.
         """
-        a = Chem.GetAdjacencyMatrix(self.mol)
-        d = Chem.GetDistanceMatrix(self.mol)
-
-        v = numpy.sum(a, axis=(1,))
-        return numpy.sum(numpy.dot(numpy.sum(a, d), v))
+        v = numpy.sum(self.a, axis=(1,))
+        return numpy.sum(numpy.dot(numpy.sum(self.a, self.d), v))
 
     def get_wiener(self):
         """Returns Wiener index.
@@ -330,8 +316,7 @@ class Chemical:
         $d_{ij}$ are elements of the distance martix of H-depleted molecular
         graph.
         """
-        d = Chem.GetDistanceMatrix(self.mol)
-        return 0.5 * numpy.sum(d)
+        return 0.5 * numpy.sum(self.d)
 
     def get_induction_parameter(self):
         """ Returns induction parameter of a molecule
@@ -348,11 +333,11 @@ class Chemical:
 
     def get_TPSA(self):
         return Descriptors.TPSA(self.mol)
-    
+
     def get_RF_delta(self):
         """Returns ring fusion density of a molecule
-        RF_delta = 2*(Rb/Ar) 
-        where Rb is number of ring bridges and Ar is 
+        RF_delta = 2*(Rb/Ar)
+        where Rb is number of ring bridges and Ar is
         the total number of atoms belonging to ring systems.
         """
         #Calculate number of ring bridges.
@@ -362,7 +347,7 @@ class Chemical:
             if RingInfo.NumBondRings(ri, b.GetIdx()) > 1:
                 Rb += 1
         # Calculate number of atoms in ring systems.
-        Ar = 0        
+        Ar = 0
         for a in self.mol.GetAtoms():
             if a.IsInRing():
                 Ar += 1
@@ -371,7 +356,7 @@ class Chemical:
         else:
             RF_delta = 2*Rb/Ar
         return RF_delta
-    
+
     def get_MCD(self):
         """Returns molecular cyclized degree."""
         A = self.mol.GetNumAtoms()
@@ -381,7 +366,7 @@ class Chemical:
                 Ar += 1
         MCD = Ar / float(A)
         return MCD
-    
+
     def get_rc(self):
         """Returns ring complexity index"""
         R = 0
@@ -396,8 +381,8 @@ class Chemical:
             rc = 0
         else:
             rc = R / float(Ar)
-        return rc        
-    
+        return rc
+
     def get_total_information_content(self):
         """Returns total information content on the adjacency equality.
 
@@ -407,10 +392,10 @@ class Chemical:
                 (A^{2} - 2 B) \log_{2}(A^2 - 2 B)
         \]
         """
-        a = Chem.GetAdjacencyMatrix(self.mol)
-        nv = len(a)
+        nv = len(self.a)
+        ne = numpy.sum(self.a) / 2
+
         nvsqr = math.pow(nv, 2)
-        ne = numpy.sum(a) / 2
         return (nvsqr * math.log(nvsqr, 2) - 2 * ne * math.log(2 * ne, 2) -
                 (nvsqr - 2 * ne) * math.log(nvsqr - 2 * ne, 2))
 
