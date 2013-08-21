@@ -3,7 +3,7 @@ import numpy
 import sys
 from rdkit import Chem
 from rdkit.Chem import Descriptors
-from rdkit.Chem.rdchem import BondType, RingInfo
+from rdkit.Chem.rdchem import BondType
 
 
 class Chemical:
@@ -336,28 +336,26 @@ class Chemical:
     def get_TPSA(self):
         return Descriptors.TPSA(self.mol)
 
-    def get_RF_delta(self):
-        """Returns ring fusion density of a molecule
-        RF_delta = 2*(Rb/Ar)
-        where Rb is number of ring bridges and Ar is
-        the total number of atoms belonging to ring systems.
+    def get_ring_fusion_density(self):
+        """Returns ring fusion density of a molecule.
+
+        Ring fusion density is defined as
+        \[
+            RF_{\delta} = 2 \frac{R_{b}}{A_{r}}
+        \]
+        where $R_{b}$ is number of ring bridges and $A_{r}$ is the total number
+        of atoms belonging to ring systems.
         """
-        #Calculate number of ring bridges.
-        Rb = 0
         ri = self.mol.GetRingInfo()
-        for b in self.mol.GetBonds():
-            if RingInfo.NumBondRings(ri, b.GetIdx()) > 1:
-                Rb += 1
+
+        # Calculate number of ring bridges.
+        Rb = len([b for b in self.mol.GetBonds()
+                  if ri.NumBondRings(b.GetIdx()) > 1])
+
         # Calculate number of atoms in ring systems.
-        Ar = 0
-        for a in self.mol.GetAtoms():
-            if a.IsInRing():
-                Ar += 1
-        if Ar ==0:
-            RF_delta = 0
-        else:
-            RF_delta = 2*Rb/Ar
-        return RF_delta
+        Ar = len([a for a in self.mol.GetAtoms() if a.IsInRing()])
+
+        return 2 * Rb / Ar if Ar != 0 else 0
 
     def get_MCD(self):
         """Returns molecular cyclized degree."""
