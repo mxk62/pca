@@ -319,17 +319,19 @@ class Chemical:
         return 0.5 * numpy.sum(self.d)
 
     def get_induction_parameter(self):
-        """ Returns induction parameter of a molecule
-        q(ind) = 1.0 - (number of double bonds/number of atoms).
-        """
-        n_double = 0
-        n_atom = len(self.mol.GetAtoms())
+        """Returns induction parameter of a molecule.
 
-        for b in self.mol.GetBonds():
-            if b.GetBondType() == BondType.DOUBLE:
-                n_double += 1
-        q = 1.0 - (n_double / n_atom)
-        return q
+        Induction paramter of a molecule is defined as
+        \[
+            q_{ind} = 1 - \frac{N_{d}}{A},
+        \]
+        where $N_{d}$ is the number of double bonds and $A$ is the number of
+        atoms in a molecule.
+        """
+        n_atom = len(self.mol.GetAtoms())
+        n_double = len([b for b in self.mol.GetBonds()
+                        if b.GetBondType() == BondType.DOUBLE])
+        return 1.0 - n_double / n_atom
 
     def get_TPSA(self):
         return Descriptors.TPSA(self.mol)
