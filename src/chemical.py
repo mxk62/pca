@@ -252,9 +252,9 @@ class Chemical:
         natoms = len(self.a)
 
         summ = 0.0
-        for i in range(a.shape[0]):
-            eci = sum(a[i][j] * sum(a[j]) for j in range(natoms))
-            summ += sum(a[i]) * eci / max(d[i])
+        for i in range(natoms):
+            eci = sum(self.a[i][j] * sum(self.a[j]) for j in range(natoms))
+            summ += sum(self.a[i]) * eci / max(self.d[i])
         return summ
 
     def get_augmented_eccentric_connectivity(self):
