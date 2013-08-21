@@ -92,7 +92,7 @@ class Reaction:
                                        for chem in self.reactants)
         p_aliphatic_heterocycles = sum(chem.count_aliphatic_heterocycles()
                                        for chem in self.products)
-        descriptors.extend([r_aliphatic_carbocycles, p_aliphatic_carbocycles])
+        descriptors.extend([r_aliphatic_heterocycles, p_aliphatic_heterocycles])
 
         # Calculate aromatic carbocycles.
         r_aromatic_carbocycles = sum(chem.count_aromatic_carbocycles()
