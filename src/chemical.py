@@ -357,31 +357,41 @@ class Chemical:
 
         return 2 * Rb / Ar if Ar != 0 else 0
 
-    def get_MCD(self):
-        """Returns molecular cyclized degree."""
-        A = self.mol.GetNumAtoms()
-        Ar = 0
-        for a in self.mol.GetAtoms():
-            if a.IsInRing():
-                Ar += 1
-        MCD = Ar / float(A)
-        return MCD
+    def get_cyclized_degree(self):
+        """Returns molecular cyclized degree.
 
-    def get_rc(self):
-        """Returns ring complexity index"""
-        R = 0
-        Ar = 0
+        Molecular cyclized degree is defined as
+        \[
+            MCD = \frac{A_{R}}{A}
+        \]
+        where $A_{R}$ is the total number of taoms belonging to any ring
+        system.
+        """
+        A = self.mol.GetNumAtoms()
+        Ar = len([a for a in self.mol.GetAtoms() if a.IsInRing()])
+        return Ar / float(A)
+
+    def get_ring_complexity(self):
+        """Returns ring complexity index.
+
+        Ring complexity index is defined as
+        \[
+            C_{R} = \frac{R}{A_{R}}
+        \]
+        where $R$ is total ring size and $A_{r}$ is the total number of atoms
+        belonging to any ring system. For isolated rings $C_{R} = 1$, for fused
+        or bridged ring system $C_{R} > 1$, for molecules with no rings $C_{R}
+        = 0$.
+        """
         ri = self.mol.GetRingInfo()
-        for a in self.mol.GetAtoms():
-            i = RingInfo.NumAtomRings(ri,a.GetIdx())
-            R += i
-            if a.IsInRing():
-                Ar += 1
-        if Ar == 0:
-            rc = 0
-        else:
-            rc = R / float(Ar)
-        return rc
+
+        # Calculate number of atoms in ring systems.
+        Ar = len([a for a in self.mol.GetAtoms() if a.IsInRing()])
+
+        # Calculate total ring size.
+        R = sum([ri.NumAtomRings(a.GetIdx()) for a in self.mol.GetAtoms()])
+
+        return R / float(Ar) if Ar != 0 else 0
 
     def get_total_information_content(self):
         """Returns total information content on the adjacency equality.
