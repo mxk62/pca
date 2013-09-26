@@ -52,9 +52,7 @@ class Sample:
         self.clear()
         with open(filename, 'r') as f:
             line = f.readline()
-
-            uids = int(line.strip().split('\t'))
-            for uid in uids:
+            for uid in [int(s) for s in line.strip().split('\t')]:
                 record = self.coll.find_one({'_id': uid})
                 if record is not None:
                     self.sample[uid] = record
@@ -82,7 +80,7 @@ if __name__ == '__main__':
     try:
         client = MongoClient()
     except ConnectionFailure:
-        sys.err.write('Error: connection failure. Exiting.')
+        sys.stderr.write('Error: connection failure. Exiting.')
         sys.exit(1)
 
     # Create a test database if it does not exists.
