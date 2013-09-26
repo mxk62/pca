@@ -7,30 +7,33 @@ from pymongo.errors import ConnectionFailure
 class Sample:
     """Represents a random sample from a given database collection."""
 
-    def __init__(self, collection, rng_seed=None):
+    def __init__(self, collection, size=10, rng_seed=None):
         """Sets a database collection which will be used."""
 
+        # Find out database collection size.
         self.coll = collection
         self.collsize = collection.count()
-
-        self.sample = {}
 
         # Initialize pseudo-random number generator.
         self.rng = random.Random()
         self.rng.seed(rng_seed)
 
+        self.sample = {}
+        self.fetch(size)
+
     def clear(self):
         """Clears the conentent of the sample."""
         self.sample.clear()
 
-    def get(self, size=10):
-        """Returns a random sample from the collection.
+    def fetch(self, size):
+        """Fetches a random sample from the collection.
 
-        Populates and returns sample having 'size' of random, non-repeating
-        elements.
+        Populates sample having 'size' of random, non-repeating elements.
+        Each successive call, replaces previous sample content.
         """
-
         size = min(size, self.collsize)
+        if self.sample:
+            self.clear()
         while len(self.sample) < size:
             uid = self.rng.randint(0, self.collsize)
             if uid in self.sample:
@@ -40,6 +43,8 @@ class Sample:
             if record is not None:
                 self.sample[uid] = record
 
+    def get(self):
+        """Returns the content of the sample."""
         return self.sample.values()
 
     def read(self, filename):
