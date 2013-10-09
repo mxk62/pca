@@ -5,8 +5,9 @@ from chemical import Chemical
 class Reaction:
     """Represents a reaction."""
 
-    def __init__(self, smiles):
+    def __init__(self, smiles, rxnid=None):
         """Initialize entry."""
+        self.rxnid = rxnid
         self.smiles = smiles.strip()
         self.react_smis, self.prod_smis = [s.split('.')
                                            for s in self.smiles.split('>>')]
