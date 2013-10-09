@@ -27,24 +27,12 @@ def save_array(a, filename):
             f.write('\n')
 
 
-# Create a map between functional group SMARTS and their representation as
-# query molecules (used in RDKit's HasSubstructMatch() function).
-groups = {}
-with open('../data/functional_groups.txt', 'r') as f:
-    for line in f:
-        gid, smarts = line.split()
-        try:
-            pattern = Chem.MolFromSmarts(smarts)
-        except Exception:
-            continue
-        groups[smarts] = pattern
-
 # Initialize connection with the database.
 try:
     client = MongoClient()
 except ConnectionFailure:
-    sys.err.write('Error: cannot connect to the database.')
-    sys.exit()
+    sys.stderr.write('Error: cannot connect to the database.')
+    sys.exit(1)
 db = client['data']
 
 # Initialize available transforms.
@@ -61,7 +49,17 @@ sample = Sample(db['chemical'], rng_seed=1)
 reactions = {}
 for rec in sample.get(samplesize):
     smi = rec['smiles'].encode('ascii')
-    chem = Chemical(smi)
+    try:
+        chem = Chemical(smi)
+    except ValueError:
+        sys.stderr.write('Invalid chemical SMILES: {0}. Ignoring'.format(smi))
+        continue
+
+    # Ignore single element reactions, e.g. ionization. Many descriptors
+    # cannot be calculated for them since their adjacency and distance
+    # matrices are equal to zero.
+    #if len(chem.mol.GetAtoms()) == 1:
+    #    continue
 
     # Add existing incoming reactions of the chemical to the pool of all
     # possible reactions allowing for synthesizing the compound.
@@ -69,7 +67,11 @@ for rec in sample.get(samplesize):
         smi = db['reaction'].find_one({'_id': uid}).get('smiles', None)
         if smi is not None:
             smi = smi.encode('ascii')
-            reactions[smi] = Reaction(smi)
+            try:
+                reactions[smi] = Reaction(smi, rxnid=rxid)
+            except ValueError:
+                sys.stderr.write('Invalid reaction SMILES: {0}'.format(smi))
+                continue
             reactions[smi].is_published = True
 
     # Then, iterate over available transforms to generate any possible reaction
