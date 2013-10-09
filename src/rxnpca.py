@@ -42,12 +42,11 @@ for rec in db['retro'].find():
     transforms.append(t)
 
 # Get a random sample of chemical compounds.
-samplesize = 1000
-sample = Sample(db['chemical'], rng_seed=1)
+sample = Sample(db['chemical'], size=1000, rng_seed=1)
 
 # For each chemical in the sample perform a single retrosynthetic step.
 reactions = {}
-for rec in sample.get(samplesize):
+for rec in sample.get():
     smi = rec['smiles'].encode('ascii')
     try:
         chem = Chemical(smi)
