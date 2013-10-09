@@ -1,4 +1,3 @@
-import sys
 from rdkit.Chem import AllChem
 from chemical import Chemical
 
@@ -11,8 +10,11 @@ class Reaction:
         self.smiles = smiles.strip()
         self.react_smis, self.prod_smis = [s.split('.')
                                            for s in self.smiles.split('>>')]
-        self.reactants = [Chemical(smi) for smi in self.react_smis]
-        self.products = [Chemical(smi) for smi in self.prod_smis]
+        try:
+            self.reactants = [Chemical(smi) for smi in self.react_smis]
+            self.products = [Chemical(smi) for smi in self.prod_smis]
+        except ValueError:
+            raise ValueError('invalid substrates and/or products')
         self.is_published = None
 
     def get_descriptors(self):
@@ -346,8 +348,7 @@ class Transform:
         try:
             self.formula = AllChem.ReactionFromSmarts(smarts)
         except Exception:
-            print 'Error: invalid transform SMARTS: {}'.format(self.smarts)
-            sys.exit(1)
+            raise ValueError('invalid transform SMARTS')
 
 
 if __name__ == '__main__':
