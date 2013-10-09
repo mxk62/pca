@@ -141,22 +141,22 @@ save_array(status, 'status.dat')
 #  - output_dim=10 will keep first 10 principal components
 #  - output_dim=0.8 will keep the number of principal components which can
 #    account for 80% of the input variance.
-pcanode = mdp.nodes.PCANode(output_dim=0.95)
+#pcanode = mdp.nodes.PCANode(output_dim=0.95)
 
 # The node need to be trained to perform its task. PCA algorithm requires the
 # computation of the mean and covariance matrix of a set of training data from
 # which the principal eigenvectors of the data distribution are estimated.
-pcanode.train(array(indata))
+#pcanode.train(array(indata))
 
 # To make PCA algorithm to compute the selected principal eigenvectors,
 # training must be finalized.
-pcanode.stop_training()
+#pcanode.stop_training()
 
 # Once the training is finished, it is possible to execute the node, i.e. to
 # project the input data on the principal components learned in the training
 # phase.
-outdata = pcanode.execute(array(indata))
-for i, x in enumerate(pcanode.d, start=1):
-    print i, x
+#outdata = pcanode.execute(array(indata))
+#for i, x in enumerate(pcanode.d, start=1):
+#    print i, x
 
-save_array(outdata, 'projection.dat')
+#save_array(outdata, 'projection.dat')
