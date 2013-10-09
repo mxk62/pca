@@ -84,25 +84,28 @@ for rec in sample.get(samplesize):
 
 # Find functional groups which are present on chemicals involved in each
 # reaction, either from the database or finding them from a scratch.
-field = 'functional_groups'
-bad_smis = []
-for smi, rxn in reactions.items():
-    chemicals = rxn.reactants + rxn.products
-
-    if None in [chem.mol for chem in chemicals]:
-        bad_smis.append(smi)
-        continue
-
-    for chem in chemicals:
-        rec = db.chemical.find_one({'smiles': chem.smiles})
-        if rec is not None and field in rec.keys():
-            chem.functional_groups = rec[field]
-        else:
-            chem.find_groups(groups)
-
-# For now, remove any reaction which has None among it reactants or products.
-for smi in bad_smis:
-    del reactions[smi]
+#
+# Create a map between known functional group SMARTS and their
+# representation as query molecules (used in RDKit's HasSubstructMatch()
+# function).
+#groups = {}
+#with open('../data/functional_groups.txt', 'r') as f:
+#    for line in f:
+#        gid, smarts = line.split()
+#        try:
+#            pattern = Chem.MolFromSmarts(smarts)
+#        except Exception:
+#            continue
+#        groups[smarts] = pattern
+#
+#field = 'functional_groups'
+#for smi, rxn in reactions.items():
+#    for chem in rxn.reactants + rxn.products:
+#        rec = db.chemical.find_one({'smiles': chem.smiles})
+#        if rec is not None and field in rec.keys():
+#            chem.functional_groups = rec[field]
+#        else:
+#            chem.find_groups(groups)
 
 # Calculate reactions descriptors.
 indata = []
