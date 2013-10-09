@@ -161,7 +161,8 @@ class Chemical:
         where $\eta_{i}$ is the eccentricity ($\max_{j}(d_{ij})$) of $i$-th
         atom and $\delta_{i}$ is the vertex degree of vertex $v_{i}$.
         """
-        return sum(max(self.d[i]) * sum(self.a[i]) for i in range(len(self.a)))
+        return sum(self.d[i].max() * self.a[i].sum()
+                   for i in range(self.a.shape[0]))
 
     def get_eccentric_distance_sum(self):
         """Returns eccentric distance sum index.
@@ -174,7 +175,8 @@ class Chemical:
         where $\eta_{i}$ is the eccentricity ($\max_{j}(d_{ij})$) of $i$-th
         atom and $\sigma_{i}$ is the distance degree of vertex $v_{i}$.
         """
-        return sum(max(self.d[i]) * sum(self.d[i]) for i in range(len(self.d)))
+        return sum(self.d[i].max() * self.d[i].sum()
+                   for i in range(self.d.shape[0]))
 
     def get_adjacent_eccentric_distance_sum(self):
         """Returns adjacent eccentric distance sum index.
@@ -189,8 +191,8 @@ class Chemical:
         atom, $\sigma_{i}$ and $\delta_{i}$ are the distance and is vertex
         degree of the vertex $v_{i}$ respectively.
         """
-        return sum(max(self.d[i]) * sum(self.d[i]) / sum(self.a[i])
-                   for i in range(len(self.a)))
+        return sum(self.d[i].max() * self.d[i].sum() / self.a[i].sum()
+                   for i in range(self.a.shape[0]))
 
     def get_connective_eccentricity(self):
         """Returns connective eccentricity index.
@@ -203,7 +205,8 @@ class Chemical:
         where $\eta_{i}$ and $\delta_{i}$ are the eccentricity
         ($\max_{j}(d_{ij})$) and vertex degree of vertex $v_{i}$ respectively.
         """
-        return sum(sum(self.a[i]) / max(self.d[i]) for i in range(len(self.a)))
+        return sum(self.a[i].sum() / self.d[i].max()
+                   for i in range(self.a.shape[0]))
 
     def get_eccentric_adjacency(self):
         """Returns eccentric adjacency index.
