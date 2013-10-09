@@ -63,7 +63,9 @@ for rec in sample.get():
     # Add existing incoming reactions of the chemical to the pool of all
     # possible reactions allowing for synthesizing the compound.
     for uid in rec['reactions']['produced']:
-        smi = db['reaction'].find_one({'_id': uid}).get('smiles', None)
+        rxn = db['reaction'].find_one({'_id': uid})
+        rxid = rxn.get('rxid', None)
+        smi = rxn.get('smiles', None)
         if smi is not None:
             smi = smi.encode('ascii')
             try:
@@ -107,13 +109,23 @@ for rec in sample.get():
 #            chem.find_groups(groups)
 
 # Calculate reactions descriptors.
-indata = []
+descriptors = []
+rxids = []
+smiles = []
 status = []
+
 for smi, rxn in reactions.items():
-    indata.append(rxn.get_descriptors())
+    try:
+        descriptors.append(rxn.get_descriptors())
+    except RuntimeWarning:
+        sys.stderr.write('{}'.format(rxn.smiles))
     #indata.append(rxn.get_group_descriptor(groups))
     status.append([int(rxn.is_published)])
-save_array(indata, 'descriptors.dat')
+    smiles.append([rxn.smiles])
+    rxids.append([rxn.rxnid])
+save_array(descriptors, 'descriptors.dat')
+save_array(rxids, 'rxids.dat')
+save_array(smiles, 'smiles.dat')
 save_array(status, 'status.dat')
 
 
