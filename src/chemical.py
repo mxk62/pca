@@ -1,6 +1,5 @@
 import math
 import numpy
-import sys
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 from rdkit.Chem.rdchem import BondType
@@ -11,13 +10,16 @@ class Chemical:
 
     def __init__(self, smiles):
         self.smiles = smiles.strip()
-        try:
-            self.mol = Chem.MolFromSmiles(self.smiles)
-        except Exception:
-            print 'Error: invalid compound SMILES: {}.'.format(self.smiles)
-            sys.exit(1)
+        self.mol = Chem.MolFromSmiles(self.smiles)
+        if self.mol is None:
+            raise ValueError('converting SMILES to molecule failed')
         self.a = Chem.GetAdjacencyMatrix(self.mol)
         self.d = Chem.GetDistanceMatrix(self.mol)
+        if self.a.size == 0 or self.d.size == 0:
+            raise ValueError('at least one of graph matrices is empty')
+        if (not numpy.isfinite(self.a).all() or
+                not numpy.isfinite(self.d).all()):
+            raise ValueError('non-finite elements in graph matrices')
         self.functional_groups = None
 
     def count_H_acceptors(self):
