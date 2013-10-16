@@ -6,6 +6,8 @@ rxnsort.py
 Syeda Sabrina
 
 This script returns two files after grouping reactions with same product.
+After grouping the reaction, we make reaction pair for validation of
+scoring function.
 
 """
 from rdkit import Chem
