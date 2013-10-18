@@ -17,6 +17,28 @@ class Reaction:
         except ValueError:
             raise ValueError('invalid substrates and/or products')
 
+    def __eq__(self, other):
+        """Defines equality operator for class instances.
+
+        Reactions B is considered to be equal to reaction A, if its both
+        reactant and product SMILES are respective subsets of reaction A's
+        reactants and products SMILES.
+        """
+        return (set(other.react_smis).issubset(self.react_smis) and
+                set(other.prod_smis).issubset(self.prod_smis))
+
+    def __ne__(self, other):
+        """Defines inequality operator for class instances.
+
+        Reactions A and B are considered unequal when they are not equal.
+
+        Note:
+        Although the sentence above may sound like a tautology, defining
+        equality operator does *not* automatically add a support for '!='
+        operator, it must be added explicitly.
+        """
+        return not self == other
+
     def get_descriptors(self):
         """Calculates and returns a list of reaction descriptors.
 
