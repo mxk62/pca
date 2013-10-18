@@ -15,11 +15,6 @@ class Chemical:
             raise ValueError('converting SMILES to molecule failed')
         self.a = Chem.GetAdjacencyMatrix(self.mol)
         self.d = Chem.GetDistanceMatrix(self.mol)
-        if self.a.size == 0 or self.d.size == 0:
-            raise ValueError('at least one of graph matrices is empty')
-        if (not numpy.isfinite(self.a).all() or
-                not numpy.isfinite(self.d).all()):
-            raise ValueError('non-finite elements in graph matrices')
         self.functional_groups = None
 
     def count_H_acceptors(self):
