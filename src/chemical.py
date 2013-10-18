@@ -295,7 +295,7 @@ class Chemical:
         Schultz molecular topological index is defined as
         \[
             MTI = \sum_{i = 1}^{A}
-                [(\mathbf(A) + \mathbf(D)) \dot \mathbf{v}]_{i} =
+                [(\mathbf{A} + \mathbf{D}) \dot \mathbf{v}]_{i} =
                     \sum_{i = 1}^{A} t_{i}
         \]
         with $\mathbf{A}$, $\mathbf{D}$ being adjacency and distance matrix
@@ -303,8 +303,8 @@ class Chemical:
         constitued by the vertex degrees of the atoms in the H-depleted
         molecular graph.
         """
-        v = numpy.sum(self.a, axis=(1,))
-        return numpy.sum(numpy.dot(numpy.sum(self.a, self.d), v))
+        v = self.a.sum(axis=(1,))
+        return numpy.sum(numpy.dot(self.a + self.d, v))
 
     def get_wiener(self):
         """Returns Wiener index.
