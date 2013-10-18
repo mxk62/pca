@@ -79,4 +79,7 @@ class Transform:
 
 
 if __name__ == '__main__':
-    pass
+    # An example reaction with single atom reactant.
+    smi = 'CCCCCCC(=C=O)CC(N)C(=O)O.O>>CCCCCC[C@H](C[C@H](N)C(=O)O)C(=O)O'
+    rxn = Reaction(smi)
+    rxn.get_descriptors()
