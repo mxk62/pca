@@ -1,3 +1,4 @@
+import inspect
 import math
 import numpy
 from rdkit import Chem
@@ -5,8 +6,14 @@ from rdkit.Chem import Descriptors
 from rdkit.Chem.rdchem import BondType
 
 
-class Chemical:
+class Chemical(object):
     """Represents a chemical compound."""
+
+    class __metaclass__(type):
+        def __iter__(cls):
+            """Returns an iterator over available descriptor names."""
+            return (t for t in inspect.getmembers(cls, inspect.ismethod)
+                    if t[0].find('count') >= 0 or t[0].find('get') >= 0)
 
     def __init__(self, smiles):
         self.smiles = smiles.strip()
