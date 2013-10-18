@@ -48,6 +48,11 @@ for rec in db['retro'].find():
 # Get a random sample of chemical compounds.
 sample = Sample(db['chemical'], size=1000, rng_seed=1)
 
+# Initialize data structures for stats gathering.
+keys = ['accepted', 'valid', 'total']
+new_stats = dict(zip(keys, len(keys) * [0]))
+old_stats = dict(zip(keys, len(keys) * [0]))
+
 # For each chemical in the sample perform a single retrosynthetic step.
 reactions = {}
 for chem_rec in sample.get():
@@ -69,11 +74,13 @@ for chem_rec in sample.get():
     new_rxns = {}
     for t in transforms:
         possible = chem.make_retrostep(t)
+        new_stats['total'] += len(possible)
         for smi in set(possible).difference(reactions):
             try:
                 new_rxns[smi] = Reaction(smi)
             except ValueError:
                 continue
+            new_stats['valid'] += 1
     reactions.update(new_rxns)
 
     # Then use database to find out which of those reactions are already
@@ -82,6 +89,7 @@ for chem_rec in sample.get():
         rxn_rec = db['reaction'].find_one({'_id': uid})
         if rxn_rec is None:
             continue
+        old_stats['total'] += 1
 
         # RX.ID are not unique thus the 'rxid' field in the database is a
         # list. Pick the first eleemnt, if not empty. Use -1 to mark
@@ -94,10 +102,17 @@ for chem_rec in sample.get():
                 old_rxn = Reaction(old_smi.encode('ascii'), rxnid=rxid)
             except ValueError:
                 continue
+            old_stats['valid'] += 1
             for new_rxn in [r for r in new_rxns.values() if r == old_rxn]:
                 del reactions[new_rxn.smiles]
                 reactions[old_rxn.smiles] = old_rxn
+                old_stats['accepted'] += 1
 
+print "Reaction stats:"
+print "published: total, valid, accepted"
+print old_stats['total'], old_stats['valid'], old_stats['accepted']
+print "unpublished: total, valid"
+print new_stats['total'], new_stats['valid']
 
 # Find functional groups which are present on chemicals involved in each
 # reaction, either from the database or finding them from a scratch.
