@@ -16,7 +16,6 @@ class Reaction:
             self.products = [Chemical(smi) for smi in self.prod_smis]
         except ValueError:
             raise ValueError('invalid substrates and/or products')
-        self.is_published = None
 
     def get_descriptors(self):
         """Calculates and returns a list of reaction descriptors.

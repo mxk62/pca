@@ -120,7 +120,7 @@ for smi, rxn in reactions.items():
     except RuntimeWarning:
         sys.stderr.write('{}'.format(rxn.smiles))
     #indata.append(rxn.get_group_descriptor(groups))
-    status.append([int(rxn.is_published)])
+    status.append([1 if rxn.rxnid is not None else 0])
     smiles.append([rxn.smiles])
     rxids.append([rxn.rxnid])
 save_array(descriptors, 'descriptors.dat')
