@@ -35,19 +35,23 @@ except ConnectionFailure:
     sys.exit(1)
 db = client['data']
 
-# Initialize available transforms.
+# Initialize available transforms. Ignore ones having more than one retron.
 transforms = []
 for rec in db['retro'].find():
-    t = Transform(rec['reaction_smarts'].encode('ascii'))
-    transforms.append(t)
+    try:
+        t = Transform(rec['reaction_smarts'].encode('ascii'))
+    except ValueError:
+        continue
+    if len(t.retrons) == 1:
+        transforms.append(t)
 
 # Get a random sample of chemical compounds.
 sample = Sample(db['chemical'], size=1000, rng_seed=1)
 
 # For each chemical in the sample perform a single retrosynthetic step.
 reactions = {}
-for rec in sample.get():
-    smi = rec['smiles'].encode('ascii')
+for chem_rec in sample.get():
+    smi = chem_rec['smiles'].encode('ascii')
     try:
         chem = Chemical(smi)
     except ValueError:
@@ -56,32 +60,44 @@ for rec in sample.get():
 
     # Ignore single element reactions, e.g. ionization. Many descriptors
     # cannot be calculated for them since their adjacency and distance
-    # matrices are equal to zero.
-    #if len(chem.mol.GetAtoms()) == 1:
-    #    continue
+    # matrices are equal to zero in such cases.
+    if len(chem.mol.GetAtoms()) == 1:
+        continue
 
-    # Add existing incoming reactions of the chemical to the pool of all
-    # possible reactions allowing for synthesizing the compound.
-    for uid in rec['reactions']['produced']:
-        rxn = db['reaction'].find_one({'_id': uid})
-        rxid = rxn.get('rxid', None)
-        smi = rxn.get('smiles', None)
-        if smi is not None:
-            smi = smi.encode('ascii')
+    # For chemical at hand, iterate over available transforms to generate any
+    # possible incoming reactions leading to it.
+    new_rxns = {}
+    for t in transforms:
+        possible = chem.make_retrostep(t)
+        for smi in set(possible).difference(reactions):
             try:
-                reactions[smi] = Reaction(smi, rxnid=rxid)
+                new_rxns[smi] = Reaction(smi)
             except ValueError:
-                sys.stderr.write('Invalid reaction SMILES: {0}'.format(smi))
                 continue
-            reactions[smi].is_published = True
+    reactions.update(new_rxns)
 
-    # Then, iterate over available transforms to generate any possible reaction
-    # leading to it, adding only unknown new ones to the pool.
-    for t in [t for t in transforms if len(t.retrons) == 1]:
-        for smi in chem.make_retrostep(t):
-            if smi not in reactions:
-                reactions[smi] = Reaction(smi)
-                reactions[smi].is_published = False
+    # Then use database to find out which of those reactions are already
+    # published.
+    for uid in chem_rec['reactions']['produced']:
+        rxn_rec = db['reaction'].find_one({'_id': uid})
+        if rxn_rec is None:
+            continue
+
+        # RX.ID are not unique thus the 'rxid' field in the database is a
+        # list. Pick the first eleemnt, if not empty. Use -1 to mark
+        # published reaction without a known RX.ID.
+        rxid = rxn_rec.get('rxid', [-1])[0]
+
+        old_smi = rxn_rec.get('smiles', None)
+        if old_smi is not None:
+            try:
+                old_rxn = Reaction(old_smi.encode('ascii'), rxnid=rxid)
+            except ValueError:
+                continue
+            for new_rxn in [r for r in new_rxns.values() if r == old_rxn]:
+                del reactions[new_rxn.smiles]
+                reactions[old_rxn.smiles] = old_rxn
+
 
 # Find functional groups which are present on chemicals involved in each
 # reaction, either from the database or finding them from a scratch.
@@ -113,7 +129,6 @@ descriptors = []
 rxids = []
 smiles = []
 status = []
-
 for smi, rxn in reactions.items():
     try:
         descriptors.append(rxn.get_descriptors())
@@ -127,7 +142,6 @@ save_array(descriptors, 'descriptors.dat')
 save_array(rxids, 'rxids.dat')
 save_array(smiles, 'smiles.dat')
 save_array(status, 'status.dat')
-
 
 # Here goes PCA analysis with help of Modular toolkit for Data Processing
 # (MDP):
