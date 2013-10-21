@@ -5,7 +5,7 @@ from chemical import Chemical
 class Reaction:
     """Represents a reaction."""
 
-    def __init__(self, smiles, rxnid=None, year = 2020):
+    def __init__(self, smiles, rxnid=None, year=None):
         """Initialize entry."""
         self.rxnid = rxnid
         self.year = year
