@@ -98,12 +98,21 @@ for chem_rec in sample.get():
         # list. Pick the first element, if not empty. Use -1 to mark
         # published reaction without a known RX.ID.
         rxid = rxn_rec.get('rxid', [-1])[0]
-
+        
+        # 'year' field is a list of publication year of a published reaction.
+        # Pick the first year from the list, otherwise set it to zero if publication
+        # year is not reported in the database.
+        p_yr = rxn_rec.get('year', [0])[0]
+        
+        # Reported smiles of published reaction in the database.
         old_smi = rxn_rec.get('smiles', None)
-        smiles_directory = {}
+        
+        # keep track between reported smiles and retro-generated smiles of 
+        # published reactions.
+        smiles_directory = {}  
         if old_smi is not None:
             try:
-                old_rxn = Reaction(old_smi.encode('ascii'), rxnid=rxid)
+                old_rxn = Reaction(old_smi.encode('ascii'), rxnid=rxid, year = p_yr)
             except ValueError:
                 continue
             old_stats['valid'] += 1
@@ -152,6 +161,7 @@ descriptors = []
 rxids = []
 smiles = []
 status = []
+year = []
 for smi, rxn in reactions.items():
     try:
         descriptors.append(rxn.get_descriptors())
@@ -161,6 +171,7 @@ for smi, rxn in reactions.items():
     status.append([1 if rxn.rxnid is not None else 0])
     smiles.append([rxn.smiles])
     rxids.append([rxn.rxnid])
+    year.append([rxn.year])
 # Keep track of reported and retro-generated smiles 
 # of published reactions.
 retrosmiles = []
@@ -173,6 +184,7 @@ save_array(descriptors, 'descriptors.dat')
 save_array(rxids, 'rxids.dat')
 save_array(smiles, 'smiles.dat')
 save_array(status, 'status.dat')
+save_array(year,'year.txt')
 save_array(retrosmiles, 'retrosmiles.txt')
 save_array(reportedsmiles, 'reportedsmiles.txt')
 
