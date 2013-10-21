@@ -3,11 +3,8 @@
 """
 rxnpca.py
 
-Script returns a training set to perform linear discriminant analysis (LDA) for 
-random chemicals in the database. Training set consists of published and unpublished 
-single step reactions of the chemicals and molecular descriptors/features of their 
-reactants and products.
-
+Script performs principal component analysis (PCA) for random chemicals in the
+database.
 """
 
 import sys
