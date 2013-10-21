@@ -103,7 +103,7 @@ for chem_rec in sample.get():
             except ValueError:
                 continue
             old_stats['valid'] += 1
-            for new_rxn in [r for r in new_rxns.values() if r == old_rxn]:
+            for new_rxn in [r for r in new_rxns.values() if r.equals(old_rxn)]:
                 del reactions[new_rxn.smiles]
                 reactions[old_rxn.smiles] = old_rxn
                 old_stats['accepted'] += 1
