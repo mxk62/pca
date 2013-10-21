@@ -51,7 +51,7 @@ for rec in db['retro'].find():
 # Get a random sample of chemical compounds.
 sample = Sample(db['chemical'], size=1000, rng_seed=1)
 
-# Initialize data structures for status gathering.
+# Initialize data structures for stats gathering.
 keys = ['accepted', 'valid', 'total']
 new_stats = dict(zip(keys, len(keys) * [0]))
 old_stats = dict(zip(keys, len(keys) * [0]))
@@ -116,7 +116,7 @@ for chem_rec in sample.get():
                 reactions[new_rxn.smiles].year = year
                 old_stats['accepted'] += 1
 
-print "Reaction status:"
+print "Reaction stats:"
 print "published: total, valid, accepted"
 print old_stats['total'], old_stats['valid'], old_stats['accepted']
 print "unpublished: total, valid"
