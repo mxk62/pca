@@ -3,8 +3,11 @@
 """
 rxnpca.py
 
-Scripts performs principal component analysis (PCA) for a given sample of
-chemical reactions and their descriptors.
+Script returns a training set to perform linear discriminant analysis (LDA) for 
+random chemicals in the database. Training set consists of published and unpublished 
+single step reactions of the chemicals and molecular descriptors/features of their 
+reactants and products.
+
 """
 
 import sys
@@ -48,7 +51,7 @@ for rec in db['retro'].find():
 # Get a random sample of chemical compounds.
 sample = Sample(db['chemical'], size=1000, rng_seed=1)
 
-# Initialize data structures for stats gathering.
+# Initialize data structures for status gathering.
 keys = ['accepted', 'valid', 'total']
 new_stats = dict(zip(keys, len(keys) * [0]))
 old_stats = dict(zip(keys, len(keys) * [0]))
@@ -92,7 +95,7 @@ for chem_rec in sample.get():
         old_stats['total'] += 1
 
         # RX.ID are not unique thus the 'rxid' field in the database is a
-        # list. Pick the first eleemnt, if not empty. Use -1 to mark
+        # list. Pick the first element, if not empty. Use -1 to mark
         # published reaction without a known RX.ID.
         rxid = rxn_rec.get('rxid', [-1])[0]
 
@@ -108,7 +111,7 @@ for chem_rec in sample.get():
                 reactions[old_rxn.smiles] = old_rxn
                 old_stats['accepted'] += 1
 
-print "Reaction stats:"
+print "Reaction status:"
 print "published: total, valid, accepted"
 print old_stats['total'], old_stats['valid'], old_stats['accepted']
 print "unpublished: total, valid"
