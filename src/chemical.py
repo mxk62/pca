@@ -11,7 +11,12 @@ class Chemical(object):
 
     class __metaclass__(type):
         def __iter__(cls):
-            """Returns an iterator over available descriptor names."""
+            """Returns an iterator over available descriptor names.
+
+            Returns all descriptor methods in a list of (name, value) sorted
+            by name. It works under assumption that descriptor method names
+            start with either 'count' or 'get'.
+            """
             return (t for t in inspect.getmembers(cls, inspect.ismethod)
                     if t[0].find('count') >= 0 or t[0].find('get') >= 0)
 
