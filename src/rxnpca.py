@@ -88,9 +88,9 @@ for chem_rec in sample.get():
                 rxn = Reaction(smi)
             except ValueError:
                 continue
-            new_stats['valid'] += 1
             new_rxns[smi] = rxn
             new_stats['accepted'] += 1
+            new_stats['valid'] += 1
     reactions.update(new_rxns)
             
     # Then use database to find out which of those reactions are already
@@ -155,26 +155,25 @@ print 'Disconnected chemicals: ', disconnected_count
 #            chem.find_groups(groups)
 
 # Calculate reactions descriptors.
-#descriptors = []
+descriptors = []
 rxids = []
 smiles = []
 status = []
 year = []
 for smi, rxn in reactions.items():
-    try:
-        descriptors.append(rxn.get_descriptors())
-    except RuntimeWarning:
-        sys.stderr.write('{}'.format(rxn.smiles))
-    indata.append(rxn.get_group_descriptor(groups))
-    status.append([1 if rxn.rxnid is not None else 0])
-    smiles.append([rxn.smiles])
-    rxids.append([rxn.rxnid])
-    year.append([rxn.year])
+    descriptors.append(rxn.get_descriptors())
 
+    # MUST stay commented out if functional groups are not initialized above.
+    #descriptors.append(rxn.get_group_descriptor())
+
+    status.append([1 if rxn.rxnid is not None else 0])
+    rxids.append([rxn.rxnid])
+    smiles.append([rxn.smiles])
+    year.append([rxn.year])
 save_array(descriptors, 'descriptors.dat')
+save_array(status, 'status.dat')
 save_array(rxids, 'rxids.dat')
 save_array(smiles, 'smiles.dat')
-save_array(status, 'status.dat')
 save_array(year, 'year.dat')
 
 # Here goes PCA analysis with help of Modular toolkit for Data Processing
