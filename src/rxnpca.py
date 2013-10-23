@@ -124,8 +124,8 @@ for chem_rec in sample.get():
                 old_stats['accepted'] += 1
 
 print "Reaction stats (accepted, valid, total):"
-print " * published:", " ".join([old_stats[k] for k in sorted(old_stats)])
-print " * unpublished:", " ".join([new_stats[k] for k in sorted(new_stats)])
+print " * published:", ", ".join(str(old_stats[k]) for k in keys)
+print " * unpublished:", ", ".join(str(new_stats[k]) for k in keys)
 print
 print 'Disconnected chemicals: ', disconnected_count
 
