@@ -37,8 +37,8 @@ def save_array(a, filename):
 if __name__ == "__main__":
     
     # Load list of reaction smiles and their status.
-    rxn_smiles = loadList('../src/smiles.dat')
-    rxn_status = loadList('../src/status.dat')
+    rxn_smiles = loadList('../src/smilesOLDTEST.dat')
+    rxn_status = loadList('../src/statusOLDTEST.dat')
     
     # Get reactants and products smiles.
     products = {}       # key: reaction row number and value: product smiles
@@ -104,5 +104,5 @@ if __name__ == "__main__":
    # groupedsmiles.dat file and in groupedreactions.dat file the reactions are
    # represented by their row in the training set at each row in training set
    # represent a reaction.
-    save_array(pairedrxn,'rxn_pair.txt')
+    save_array(pairedrxn,'rxn_pairOLDTEST.txt')
     #save_array(groupedsmiles,'groupedsmiles.dat')
