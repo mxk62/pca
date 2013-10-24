@@ -74,31 +74,32 @@ for chem_rec in sample.get():
     # Ignore single element reactions, e.g. ionization. Many descriptors
     # cannot be calculated for them since their adjacency and distance
     # matrices are equal to zero in such cases.
-    if len(chem.mol.GetAtoms()) == 1:
+    if chem.a.size == 1:
         continue
 
     # For chemical at hand, iterate over available transforms to generate any
     # possible incoming reactions leading to it.
-    new_rxns = {}
+    candidates = set([])
     for t in transforms:
-        possible = chem.make_retrostep(t)
-        new_stats['total'] += len(possible)
-        for smi in set(possible).difference(reactions):
-            try:
-                rxn = Reaction(smi)
-            except ValueError:
-                continue
-            new_rxns[smi] = rxn
-            new_stats['accepted'] += 1
-            new_stats['valid'] += 1
-    reactions.update(new_rxns)
-            
-    # Then use database to find out which of those reactions are already
-    # published.
-    for uid in chem_rec['reactions']['produced']:
-        rxn_rec = db['reaction'].find_one({'_id': uid})
-        if rxn_rec is None:
+        candidates.update(chem.make_retrostep(t))
+    new_stats['total'] += len(candidates)
+
+    # Then add valid ones which were not yet generated to the main pool.
+    new_rxns = {}
+    for smi in candidates.difference(reactions):
+        try:
+            rxn = Reaction(smi)
+        except ValueError:
             continue
+        new_rxns[smi] = rxn
+    new_stats['accepted'] += len(new_rxns)
+    new_stats['valid'] += len(new_rxns)
+    reactions.update(new_rxns)
+
+    # Finally, use the database to find out which of those newly  added
+    # reactions are already published.
+    cursor = db['reaction'].find({'_id': {'$in': chem_rec['reactions']['produced']}})
+    for rxn_rec in cursor:
         old_stats['total'] += 1
 
         # RX.ID are not unique thus the 'rxid' field in the database is a
