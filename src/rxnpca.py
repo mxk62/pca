@@ -9,6 +9,7 @@ database.
 
 import sys
 import mdp
+import random
 from numpy import array
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
@@ -154,6 +155,34 @@ print 'Disconnected chemicals: ', disconnected_count
 #            chem.functional_groups = rec[field]
 #        else:
 #            chem.find_groups(groups)
+
+# Sort reaction based on their products and category
+#
+# Sorted reactions are stored in a dictionary in which a key is a product
+# SMILES and value are reactions sharing the same products. Those reactions
+# are also stored in a dictionary which may have at most two keys: 'published'
+# and 'unpublished'. If key exists, its corresponding value is a list of
+# reactions of a given type. It other words it looks like this:
+#
+#     { product SMILES: { 'published': [], 'unpublished': [] } }
+sorted_rxns = {}
+for rxn in reactions.values():
+    smi = rxn.prod_smis[0]
+    sorted_rxns.setdefault(smi, {})
+
+    category = 'unpublished' if rxn.rxnid is None else 'published'
+    sorted_rxns[smi].setdefault(category, []).append(rxn)
+
+# Discard entries which do not have either published or unpublished reactions.
+sorted_rxns = {key: val for key, val in sorted_rxns.items()
+               if len(sorted_rxns[key]) == 2}
+
+# For each available product, select randomly a reaction from each category.
+reactions = {}
+for entry in sorted_rxns.values():
+    for rxns in entry.values():
+        rnd_rxn = rxns[random.randint(0, len(rxns) - 1)]
+        reactions[rnd_rxn.smiles] = rnd_rxn
 
 # Calculate reactions descriptors.
 descriptors = []
