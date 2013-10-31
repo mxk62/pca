@@ -27,7 +27,6 @@ def save_array(a, filename):
                 f.write(str(e) + ' ')
             f.write('\n')
 
-
 # Initialize connection with the database.
 try:
     client = MongoClient('130.203.235.117')
@@ -40,7 +39,8 @@ db = client['data']
 transforms = []
 for rec in db['retro'].find():
     try:
-        t = Transform(rec['reaction_smarts'].encode('ascii'))
+        t = Transform(rec['reaction_smarts'].encode('ascii'),
+                      dbid=rec['old_ID'])
     except ValueError:
         continue
     if len(t.retrons) == 1:
@@ -80,16 +80,16 @@ for chem_rec in sample.get():
 
     # For chemical at hand, iterate over available transforms to generate any
     # possible incoming reactions leading to it.
-    candidates = set([])
+    candidates = {}
     for t in transforms:
-        candidates.update(chem.make_retrostep(t))
+        candidates.update({s: t.popularity for s in chem.make_retrostep(t)})
     new_stats['total'] += len(candidates)
 
     # Then add valid ones which were not yet generated to the main pool.
     new_rxns = {}
-    for smi in candidates.difference(reactions):
+    for smi in set(candidates.keys()).difference(reactions):
         try:
-            rxn = Reaction(smi)
+            rxn = Reaction(smi, popularity=candidates[smi])
         except ValueError:
             continue
         new_rxns[smi] = rxn
@@ -99,7 +99,8 @@ for chem_rec in sample.get():
 
     # Finally, use the database to find out which of those newly  added
     # reactions are already published.
-    cursor = db['reaction'].find({'_id': {'$in': chem_rec['reactions']['produced']}})
+    cursor = db['reaction'].find(
+        {'_id': {'$in': chem_rec['reactions']['produced']}})
     for rxn_rec in cursor:
         old_stats['total'] += 1
 
@@ -178,11 +179,20 @@ sorted_rxns = {key: val for key, val in sorted_rxns.items()
                if len(sorted_rxns[key]) == 2}
 
 # For each available product, select randomly a reaction from each category.
+#reactions = {}
+#for entry in sorted_rxns.values():
+#    for rxns in entry.values():
+#        rnd_rxn = rxns[random.randint(0, len(rxns) - 1)]
+#        reactions[rnd_rxn.smiles] = rnd_rxn
+
+# For each available product, from each category, select a reaction having
+# maximal popularity.
 reactions = {}
 for entry in sorted_rxns.values():
     for rxns in entry.values():
-        rnd_rxn = rxns[random.randint(0, len(rxns) - 1)]
-        reactions[rnd_rxn.smiles] = rnd_rxn
+        p = [r.popularity for r in rxns]
+        rxn = rxns[p.index(max(p))]
+        reactions[rxn.smiles] = rxn
 
 # Calculate reactions descriptors.
 descriptors = []
@@ -190,7 +200,8 @@ rxids = []
 smiles = []
 status = []
 year = []
-for smi, rxn in reactions.items():
+popularity = []
+for rxn in reactions.values():
     descriptors.append(rxn.get_descriptors())
 
     # MUST stay commented out if functional groups are not initialized above.
@@ -198,11 +209,13 @@ for smi, rxn in reactions.items():
 
     status.append([1 if rxn.rxnid is not None else 0])
     rxids.append([rxn.rxnid])
+    popularity.append([rxn.popularity])
     smiles.append([rxn.smiles])
     year.append([rxn.year])
 save_array(descriptors, 'descriptors.dat')
 save_array(status, 'status.dat')
 save_array(rxids, 'rxids.dat')
+save_array(popularity, 'popularity.dat')
 save_array(smiles, 'smiles.dat')
 save_array(year, 'year.dat')
 
