@@ -29,17 +29,17 @@ To run the script type (currently all arguments are optional):
 
 where
 
-+	**<size>**
++	**size**
 
 	Sample size, i.e. number of chemicals for which reactions will be
 	generated. Defaults to 1000.
 
-+	**<seed>**
++	**seed**
 
 	Pseudo-random number generator seed. Default to `None`, meaning that
 	current system time will be used.
 
-+	**<type>**
++	**type**
 
 	Selection method of reactions sharing the same product. Available
 	choices are:
