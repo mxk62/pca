@@ -20,6 +20,22 @@ from reaction import Reaction, Transform
 from chemical import Chemical
 
 
+def get_random(reactions):
+    """Returns a random reaction."""
+    return reactions[random.randint(0, len(reactions) - 1)]
+
+
+def get_popular(reactions):
+    """Returns a reaction with the highest popularity index."""
+    p = [r.popularity for r in rxns]
+    return reactions[p.index(max(p))]
+
+
+def get_all(reactions):
+    """Returns all reactions."""
+    return reactions
+
+
 def save_array(a, filename):
     """Saves array in a file."""
     with open(filename, 'w') as f:
@@ -35,6 +51,10 @@ parser.add_argument('--seed', type=int, default=None,
                     help='generator seed, defaults to None')
 parser.add_argument('--size', type=int, default=1000,
                     help='sample size, defaults to 1000')
+parser.add_argument('--selection-type', type=str, default='all',
+                    choices=['all', 'popular', 'random'],
+                    help='reaction selection method (all, popular, random);'
+                         'default to \'all\'')
 args = parser.parse_args()
 
 # Initialize connection with the database.
@@ -188,21 +208,15 @@ for rxn in reactions.values():
 sorted_rxns = {key: val for key, val in sorted_rxns.items()
                if len(sorted_rxns[key]) == 2}
 
-# For each available product, select randomly a reaction from each category.
-#reactions = {}
-#for entry in sorted_rxns.values():
-#    for rxns in entry.values():
-#        rnd_rxn = rxns[random.randint(0, len(rxns) - 1)]
-#        reactions[rnd_rxn.smiles] = rnd_rxn
-
-# For each available product, from each category, select a reaction having
-# maximal popularity.
+# For each available product, from each category, select a reaction based on
+# specified method, either all, picked at random or according to its
+# popularity.
 reactions = {}
+method = {'all': get_all, 'popular': get_popular, 'random': get_random,}
 for entry in sorted_rxns.values():
     for rxns in entry.values():
-        p = [r.popularity for r in rxns]
-        rxn = rxns[p.index(max(p))]
-        reactions[rxn.smiles] = rxn
+        reactions.update({r.smiles: r
+                          for r in method[args.selection_type](rxns)})
 
 # Calculate reactions descriptors and save them to a file. Dump reactions'
 # auxiliary data (id, year, popularity, etc.) too.
