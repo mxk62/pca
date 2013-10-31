@@ -7,6 +7,7 @@ Script performs principal component analysis (PCA) for random chemicals in the
 database.
 """
 
+import argparse
 import sys
 import mdp
 import random
@@ -26,6 +27,15 @@ def save_array(a, filename):
             for e in row:
                 f.write(str(e) + ' ')
             f.write('\n')
+
+
+# Parse command line options.
+parser = argparse.ArgumentParser()
+parser.add_argument('--seed', type=int, default=None,
+                    help='generator seed, defaults to None')
+parser.add_argument('--size', type=int, default=1000,
+                    help='sample size, defaults to 1000')
+args = parser.parse_args()
 
 # Initialize connection with the database.
 try:
@@ -47,7 +57,7 @@ for rec in db['retro'].find():
         transforms.append(t)
 
 # Get a random sample of chemical compounds.
-sample = Sample(db['chemical'], size=1000, rng_seed=1)
+sample = Sample(db['chemical'], size=args.size, rng_seed=args.seed)
 
 # Initialize data structures for stats gathering.
 keys = ['accepted', 'valid', 'total']
