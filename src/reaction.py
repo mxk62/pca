@@ -1,12 +1,14 @@
 from rdkit.Chem import AllChem
 from chemical import Chemical
+from popularity import POPULARITY
 
 
 class Reaction:
     """Represents a reaction."""
 
-    def __init__(self, smiles, rxnid=None, year=None):
+    def __init__(self, smiles, popularity=None, rxnid=None, year=None):
         """Initialize entry."""
+        self.popularity = popularity
         self.rxnid = rxnid
         self.year = year
         self.smiles = smiles.strip()
@@ -79,7 +81,8 @@ class Reaction:
 class Transform:
     """Represents retrosynthetic transform."""
 
-    def __init__(self, smarts):
+    def __init__(self, smarts, dbid=None):
+        self.id = dbid
         self.smarts = smarts
         self.retrons, self.synthons = [s.split('.')
                                        for s in smarts.split('>>')]
@@ -87,6 +90,11 @@ class Transform:
             self.formula = AllChem.ReactionFromSmarts(smarts)
         except Exception:
             raise ValueError('invalid transform SMARTS')
+
+        try:
+            self.popularity = POPULARITY[dbid]
+        except KeyError:
+            self.popularity = 0
 
 
 if __name__ == '__main__':
