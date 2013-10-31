@@ -194,30 +194,21 @@ for entry in sorted_rxns.values():
         rxn = rxns[p.index(max(p))]
         reactions[rxn.smiles] = rxn
 
-# Calculate reactions descriptors.
+# Calculate reactions descriptors and save them to a file. Dump reactions'
+# auxiliary data (id, year, popularity, etc.) too.
 descriptors = []
-rxids = []
-smiles = []
-status = []
-year = []
-popularity = []
+auxiliaries = []
 for rxn in reactions.values():
     descriptors.append(rxn.get_descriptors())
 
     # MUST stay commented out if functional groups are not initialized above.
     #descriptors.append(rxn.get_group_descriptor())
 
-    status.append([1 if rxn.rxnid is not None else 0])
-    rxids.append([rxn.rxnid])
-    popularity.append([rxn.popularity])
-    smiles.append([rxn.smiles])
-    year.append([rxn.year])
+    status = 1 if rxn.rxnid is not None else 0
+    auxiliaries.append([rxn.rxnid, rxn.year, rxn.popularity, status,
+                        rxn.smiles])
 save_array(descriptors, 'descriptors.dat')
-save_array(status, 'status.dat')
-save_array(rxids, 'rxids.dat')
-save_array(popularity, 'popularity.dat')
-save_array(smiles, 'smiles.dat')
-save_array(year, 'year.dat')
+save_array(auxiliaries, 'auxiliaries.dat')
 
 # Here goes PCA analysis with help of Modular toolkit for Data Processing
 # (MDP):
