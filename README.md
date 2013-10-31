@@ -43,7 +43,7 @@ where
 
 	Selection method of reactions sharing the same product. Available
 	choices are:
-	-	`all`: all availawill be selected,
+	-	`all`: all available reactions will be selected,
 	-	`random`: a random pair of published and unpublished reactions will
 		be selected for each product,
 	-	`popular`: a  pair of published and unpublished reactions having the
