@@ -95,7 +95,7 @@ class Transform:
         try:
             self.popularity = POPULARITY[dbid]
         except KeyError:
-            self.popularity = 0
+            self.popularity = -1
 
 
 if __name__ == '__main__':
