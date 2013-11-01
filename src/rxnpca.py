@@ -88,7 +88,11 @@ old_stats = dict(zip(keys, len(keys) * [0]))
 reactions = {}
 disconnected_count = 0
 for chem_rec in sample.get():
-    smi = chem_rec['smiles'].encode('ascii')
+    try:
+        smi = chem_rec['smiles'].encode('ascii')
+    except AttributeError:
+        sys.stderr.write('Chemical has no SMILES')
+        continue
 
     # Ignore disconnected chemicals, e.g. such as c1cc([O-].[Na+])ccc1,
     # as we treat '.' (dot) as a compound separator.
