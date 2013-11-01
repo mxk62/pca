@@ -22,13 +22,13 @@ from chemical import Chemical
 
 def get_random(reactions):
     """Returns a random reaction."""
-    return reactions[random.randint(0, len(reactions) - 1)]
+    return [reactions[random.randint(0, len(reactions) - 1)]]
 
 
 def get_popular(reactions):
     """Returns a reaction with the highest popularity index."""
     p = [r.popularity for r in rxns]
-    return reactions[p.index(max(p))]
+    return [reactions[p.index(max(p))]]
 
 
 def get_all(reactions):
