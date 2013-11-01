@@ -6,9 +6,10 @@ from popularity import POPULARITY
 class Reaction:
     """Represents a reaction."""
 
-    def __init__(self, smiles, popularity=None, rxnid=None, year=None):
+    def __init__(self, smiles, popularity=None, tid=None, rxnid=None, year=None):
         """Initialize entry."""
         self.popularity = popularity
+        self.tid = tid
         self.rxnid = rxnid
         self.year = year
         self.smiles = smiles.strip()
