@@ -170,16 +170,14 @@ possible = {}
 for rxn in reactions.values():
     tid = rxn.tid
     status = 1 if rxn.rxnid is not None else 0
-    possible.setdefault(tid,[status]).append(status)
+    possible.setdefault(tid,[]).append(status)
 
 # Get the statistics  
 # key: Transform ID
 # value: List[number of possible reactions, number of published reactions]  
 tstat = {}
-for tid in possible.keys():
-    pos_rxns = len(possible[tid])
-    p = possible[tid].count(1)
-    tstat.setdefault(tid,[pos_rxns,p])
+for tid, statuses in possible.items():
+    tstat[tid] = [len(statuses), statuses.count(1)]
     
 print "Reaction stats (accepted, valid, total):"
 print " * published:", ", ".join(str(old_stats[k]) for k in keys)
@@ -223,11 +221,12 @@ print 'Disconnected chemicals: ', disconnected_count
 #     { product SMILES: { 'published': [], 'unpublished': [] } }
 sorted_rxns = {}
 for rxn in reactions.values():
-    smi = rxn.prod_smis[0]
-    sorted_rxns.setdefault(smi, {})
+    if rxn.popularity != -1:
+        smi = rxn.prod_smis[0]
+        sorted_rxns.setdefault(smi, {})
 
-    category = 'unpublished' if rxn.rxnid is None else 'published'
-    sorted_rxns[smi].setdefault(category, []).append(rxn)
+        category = 'unpublished' if rxn.rxnid is None else 'published'
+        sorted_rxns[smi].setdefault(category, []).append(rxn)
 
 # Discard entries which do not have either published or unpublished reactions.
 sorted_rxns = {key: val for key, val in sorted_rxns.items()
