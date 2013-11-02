@@ -216,13 +216,12 @@ print 'Disconnected chemicals: ', disconnected_count
 #
 #     { product SMILES: { 'published': [], 'unpublished': [] } }
 sorted_rxns = {}
-for rxn in reactions.values():
-    if rxn.popularity != -1:
-        smi = rxn.prod_smis[0]
-        sorted_rxns.setdefault(smi, {})
+for rxn in [r for r in reactions.values() if rxn.popularity != -1]:
+    smi = rxn.prod_smis[0]
+    sorted_rxns.setdefault(smi, {})
 
-        category = 'unpublished' if rxn.rxnid is None else 'published'
-        sorted_rxns[smi].setdefault(category, []).append(rxn)
+    category = 'unpublished' if rxn.rxnid is None else 'published'
+    sorted_rxns[smi].setdefault(category, []).append(rxn)
 
 # Discard entries which do not have either published or unpublished reactions.
 sorted_rxns = {key: val for key, val in sorted_rxns.items()
