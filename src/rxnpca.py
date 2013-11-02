@@ -116,7 +116,8 @@ for chem_rec in sample.get():
     # possible incoming reactions leading to it.
     candidates = {}
     for t in transforms:
-        candidates.update({s: [t.popularity,t.id] for s in chem.make_retrostep(t)})
+        candidates.update({s: [t.popularity, t.id]
+                           for s in chem .make_retrostep(t)})
     new_stats['total'] += len(candidates)
 
     # Then add valid ones which were not yet generated to the main pool.
@@ -124,7 +125,7 @@ for chem_rec in sample.get():
     for smi in set(candidates.keys()).difference(reactions):
         try:
             rxn = Reaction(smi, popularity=candidates[smi][0], 
-                           tid = candidates[smi][1])
+                           tid=candidates[smi][1])
         except ValueError:
             continue
         new_rxns[smi] = rxn
@@ -239,7 +240,8 @@ reactions = {}
 method = {'all': get_all, 'popular': get_popular, 'random': get_random,}
 for entry in sorted_rxns.values():
     for rxns in entry.values():
-        reactions.update({r.smiles: r for r in method[args.selection_type](rxns)})
+        reactions.update({r.smiles: r
+                          for r in method[args.selection_type](rxns)})
 
 # Calculate reactions descriptors and save them to a file. Dump reactions'
 # auxiliary data (id, year, popularity, etc.) too.
