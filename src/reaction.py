@@ -1,6 +1,6 @@
 from rdkit.Chem import AllChem
 from chemical import Chemical
-from popularity import POPULARITY
+from popularity import new_popularity
 
 
 class Reaction:
@@ -93,7 +93,7 @@ class Transform:
             raise ValueError('invalid transform SMARTS')
 
         try:
-            self.popularity = POPULARITY[dbid]
+            self.popularity = new_popularity[dbid]
         except KeyError:
             self.popularity = -1
 
