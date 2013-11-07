@@ -215,8 +215,10 @@ print 'Disconnected chemicals: ', disconnected_count
 # reactions of a given type. It other words it looks like this:
 #
 #     { product SMILES: { 'published': [], 'unpublished': [] } }
+# Exclude any reaction which is published but has zero popularity.
 sorted_rxns = {}
-for rxn in [r for r in reactions.values() if rxn.popularity != -1]:
+for rxn in [r for r in reactions.values() if r.popularity != -1 and 
+            not(r.popularity == 0 and r.rxnid is not None)]:
     smi = rxn.prod_smis[0]
     sorted_rxns.setdefault(smi, {})
 
