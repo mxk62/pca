@@ -1,7 +1,9 @@
 """Defines transform popularity.
 
-Defines a dictionary which maps transforms' ids (specifically 'old_ID's) on
+Defines dictionary which maps transforms' ids on
 their popularity, i.e. the number of reactions matched by a given transform.
+POPULARITY maps "old_ID" of transforms to their popularity index and
+new_popularity maps "_id" of updated transforms to their popularity index.
 """
 POPULARITY = {
     3413: 12,
