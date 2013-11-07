@@ -70,7 +70,7 @@ transforms = []
 for rec in db['retro'].find():
     try:
         t = Transform(rec['reaction_smarts'].encode('ascii'),
-                      dbid=rec['old_ID'])
+                      dbid=rec['_id'])
     except ValueError:
         continue
     if len(t.retrons) == 1:
