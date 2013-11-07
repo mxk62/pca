@@ -251,7 +251,7 @@ for rxn in reactions.values():
     status = 1 if rxn.rxnid is not None else 0
     possible = tstat[rxn.tid][0]
     published = tstat[rxn.tid][1]
-    auxiliaries.append([rxn.rxnid, rxn.year, rxn.popularity, 
+    auxiliaries.append([rxn.rxnid, rxn.tid, rxn.year, rxn.popularity, 
                         possible, published, status])
     smiles.append([rxn.smiles])
 save_array(descriptors, 'descriptors.dat')
